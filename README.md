@@ -35,7 +35,7 @@ Database: Microsoft SQL Server Express / LocalDB
 
 IDE: Visual Studio 2022 (Community Edition)
 
-Version Control: Bitbucket / GitHub
+Version Control : GitHub
 
 🧩 Prerequisites
 

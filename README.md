@@ -85,12 +85,14 @@ Start the project (F5 or ▶ Start Debugging).
 
 The application opens automatically in your browser (https://localhost:####/).
 
+
 🔑 Default Login Accounts
-Role	Email	Password
-Owner	owner@easygamesstore.com
-	Owner@123
-Proprietor	shop1@easygamesstore.com
-	Shop@123
+
+Role			Email								Password
+Owner			owner@easygamesstore.com			Owner@123
+Proprietor		shop1@easygamesstore.com			Shop@123
+
+	
 🧠 How to Use
 
 Log in as Owner to configure shops and manage users.
@@ -99,15 +101,19 @@ Log in as Proprietor to perform POS sales and manage inventory.
 
 Register as a Customer to browse products and make purchases.
 
+
 🧰 Troubleshooting
-Issue	Possible Solution
-Database not found	Verify SQL Server instance and rerun migration.
-Login fails	Use default credentials or register a new account.
-Missing packages	Rebuild project and restore NuGet packages.
-Port conflict	Change launch port via Project Properties → Debug.
+
+Issue	            	  Possible Solution
+Database not found	  	Verify SQL Server instance and rerun migration.
+Login fails         	Use default credentials or register a new account.
+Missing packages		Rebuild project and restore NuGet packages.
+Port conflict			Change launch port via Project Properties → Debug.
+
 👥 Team Members
+
 Name	Role
-Shishtata Bhandari	Project Manager / Documentation Lead
-Dipan Shrestha	Backend Developer
-Sujan Kandel	Frontend & UI Developer
-Tirth Jyotikar	Tester / Quality Assurance
+Shishtata Bhandari		Project Manager / Documentation Lead
+Dipan Shrestha			Backend Developer
+Sujan Kandel			Frontend & UI Developer
+Tirth Jyotikar			Tester / Quality Assurance

@@ -1,0 +1,140 @@
+﻿@model IEnumerable<EasyGamesStore.Models.AppMessageRead>
+@using EasyGamesStore.Models
+@{
+    // Set the page title
+    ViewData["Title"] = "Inbox";
+
+    // Retrieve filter and search parameters from the ViewBag, or assign defaults
+    string filter = ViewBag.Filter as string ?? "All";
+    string? search = ViewBag.Search as string;
+
+    // Count of unread messages passed from the controller
+    int unread = ViewBag.UnreadCount ?? 0;
+}
+
+<!--
+    This Razor view displays the user's inbox for messages sent by the Owner or Admin.
+    It allows users to view, search, and mark messages as read.
+-->
+<div class="container py-4">
+    <!-- Page title and unread message summary -->
+    <h2 class="text-dark fw-bold mb-3">Inbox</h2>
+    <p class="text-muted">
+        View your messages, offers, and updates.
+        Unread: <span class="badge bg-warning text-dark">@unread</span>
+    </p>
+
+    <!-- Filter bar and search box -->
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <!-- 'All' filter button -->
+        <a class="btn btn-sm @(filter == "All" ? "btn-primary" : "btn-outline-primary")" asp-route-filter="All">All</a>
+
+        <!-- Dynamically create buttons for each MessageCategory -->
+        @foreach (var name in Enum.GetNames(typeof(MessageCategory)))
+        {
+            <a class="btn btn-sm @(filter == name ? "btn-primary" : "btn-outline-primary")" asp-route-filter="@name">@name</a>
+        }
+
+        <!-- Search form allowing users to look up specific messages -->
+        <form method="get" class="ms-auto d-flex gap-2">
+            <!-- Preserve the current filter when searching -->
+            <input type="hidden" name="filter" value="@filter" />
+            <input class="form-control form-control-sm" name="search" value="@search" placeholder="Search messages..." />
+            <button class="btn btn-sm btn-outline-secondary" type="submit">Search</button>
+        </form>
+
+        <!-- Button to mark all messages as read -->
+        <button id="markAll" class="btn btn-sm btn-success">Mark all read</button>
+    </div>
+
+    <!-- Loop through each AppMessageRead item and display it -->
+    @foreach (var r in Model)
+    {
+        // Get the related AppMessage object from the AppMessageRead record
+        var m = r.AppMessage!;
+
+        // Define color badges for message categories for better visual distinction
+        var badgeClass = m.Category switch
+        {
+            MessageCategory.Promotion => "bg-purple",
+            MessageCategory.Update => "bg-info",
+            MessageCategory.Welcome => "bg-success",
+            MessageCategory.Notification => "bg-primary",
+            MessageCategory.Feedback => "bg-warning text-dark",
+            _ => "bg-secondary"
+        };
+
+        <!-- Individual message card -->
+        <div class="card mb-3 shadow-sm @(r.IsRead ? "" : "border border-warning")">
+            <div class="card-body">
+                <!-- Message header: category badge, title, and date -->
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span class="badge @badgeClass me-2">@m.Category</span>
+                        <strong>@m.Title</strong>
+
+                        <!-- If unread, display 'New' badge -->
+                        @if (!r.IsRead)
+                        {
+                            <span class="badge bg-warning text-dark ms-2">New</span>
+                        }
+                    </div>
+                    <!-- Display message creation date in local time -->
+                    <small class="text-muted">@m.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</small>
+                </div>
+
+                <!-- Preview of the message body (limited height for consistency) -->
+                <div class="text-muted mt-2" style="max-height:3.5rem; overflow:hidden;">
+                    @Html.Raw(m.HtmlBody)
+                </div>
+
+                <!-- Mark as read button -->
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-outline-success mark-read" data-id="@r.Id" @(r.IsRead ? "disabled" : "")>
+                        @(r.IsRead ? "Read" : "Mark as read")
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Inline styles for additional customization -->
+<style>
+    /* Ensures the Inbox heading appears as solid black for better readability */
+    h2.text-dark {
+        color: #000 !important;
+    }
+
+    /* Custom purple color used for Promotion category badge */
+    .bg-purple {
+        background: #6f42c1 !important;
+    }
+</style>
+
+<!-- Script section for interactive functionality -->
+@section Scripts {
+    <script>
+        // Attach event listener to all "Mark as read" buttons
+        document.querySelectorAll('.mark-read').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                // Send POST request to mark a specific message as read
+                const resp = await fetch('@Url.Action("MarkRead", "Inbox")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'id=' + id
+                });
+                // Refresh the page after successful update
+                if (resp.ok) location.reload();
+            });
+        });
+
+        // "Mark all as read" button functionality
+        document.getElementById('markAll').addEventListener('click', async () => {
+            // Send POST request to mark all messages as read
+            const resp = await fetch('@Url.Action("MarkAllRead", "Inbox")', { method: 'POST' });
+            if (resp.ok) location.reload();
+        });
+    </script>
+}

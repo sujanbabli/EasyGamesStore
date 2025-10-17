@@ -1,0 +1,158 @@
+﻿@model EasyGamesStore.Models.StockItem
+@{
+    ViewData["Title"] = "Stock Item Details";
+}
+
+<!-- ========== HEADER ========== -->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold text-white mb-1">📋 Stock Item Details</h2>
+            <p class="text-light mb-0">View complete information about this product.</p>
+        </div>
+        <span class="badge bg-light text-dark">Viewed: @DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="container bg-white rounded-4 shadow-sm p-4 fade-in my-5" style="max-width: 850px;">
+    <h4 class="fw-bold text-primary mb-3">🛍️ Product Information</h4>
+    <hr />
+
+    <dl class="row mb-4">
+        <dt class="col-sm-4 fw-semibold text-secondary">Title</dt>
+        <dd class="col-sm-8">@Model?.Title</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Category</dt>
+        <dd class="col-sm-8">@Model?.Category</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Price</dt>
+        <dd class="col-sm-8">@Model?.Price.ToString("C")</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Quantity</dt>
+        <dd class="col-sm-8">@Model?.Quantity</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Image</dt>
+        <dd class="col-sm-8">
+            <img src="@(!string.IsNullOrEmpty(Model?.ImageUrl) ? Model.ImageUrl : Url.Content("~/images/placeholder.png"))"
+                 alt="@Model?.Title"
+                 class="img-fluid rounded-3 border shadow-sm"
+                 style="max-width: 250px;" />
+        </dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Short Description</dt>
+        <dd class="col-sm-8">@Model?.ShortDescription</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Average Rating</dt>
+        <dd class="col-sm-8">@Model?.AverageRating</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Review Count</dt>
+        <dd class="col-sm-8">@Model?.ReviewCount</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">New</dt>
+        <dd class="col-sm-8">@(Model?.IsNew == true ? "Yes ✅" : "No ❌")</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">On Sale</dt>
+        <dd class="col-sm-8">@(Model?.IsOnSale == true ? "Yes 🎯" : "No")</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Original Price</dt>
+        <dd class="col-sm-8">
+            @(Model?.OriginalPrice != null ? Model.OriginalPrice.ToString("C") : "-")
+        </dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Cost Price</dt>
+        <dd class="col-sm-8">
+            @(Model?.CostPrice != null ? Model.CostPrice.ToString("C") : "-")
+        </dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Source</dt>
+        <dd class="col-sm-8">@Model?.Source</dd>
+    </dl>
+
+    <!-- Buttons -->
+    <div class="d-flex align-items-center mt-4">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary px-4 me-2 shadow-sm">✏️ Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary px-4">Back to List</a>
+    </div>
+</div>
+
+<!-- ========== STYLES ========== -->
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header Bar */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Description List */
+    dt {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    dd {
+        color: #212529;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
+        }
+
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    h4 {
+        color: #0d6efd;
+    }
+</style>

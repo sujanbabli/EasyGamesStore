@@ -1,0 +1,248 @@
+﻿@{
+    ViewData["Title"] = "My Account Overview";
+    var orders = ViewBag.OrderSummaries as IEnumerable<dynamic>;
+    string userTier = ViewBag.UserTier ?? "Bronze";
+}
+
+<!--
+    My Account Overview Page
+    Displays the user's profile information, tier level, financial summaries, and full purchase history.
+    Designed with a white theme for clarity, incorporating interactive charts and modals for detail expansion.
+-->
+
+<div class="container mt-5 mb-5 bg-white text-dark p-4 rounded-4 shadow-sm">
+    <!-- ==============================
+         PROFILE HEADER SECTION
+         Displays user's avatar, name, email, and current tier
+         ============================== -->
+    <div class="profile-card p-4 rounded-4 d-flex align-items-center justify-content-between flex-wrap mb-4 bg-light border">
+        <div class="d-flex align-items-center gap-3">
+            <!-- Avatar circle: shows the first letter of username -->
+            <div class="avatar-circle fw-bold fs-3 d-flex align-items-center justify-content-center">
+                @ViewBag.UserName?.Substring(0, 1).ToUpper()
+            </div>
+
+            <!-- User basic info block -->
+            <div>
+                <h3 class="mb-1 text-dark fw-bold">@ViewBag.UserName</h3>
+                <p class="mb-1">@ViewBag.UserEmail</p>
+                <span class="badge bg-primary">@userTier Tier</span>
+                <p class="mt-2" style="max-width: 400px;">
+                    @ViewBag.UserBio "Passionate gamer exploring virtual worlds and collecting rare achievements."
+                </p>
+            </div>
+        </div>
+
+        <!-- Action buttons: Tier summary modal & download report -->
+        <div class="d-flex gap-3 mt-3 mt-md-0 flex-wrap">
+            <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#tierSummaryModal">
+                <i class="bi bi-trophy me-1"></i> View Tier & Payment Summary
+            </button>
+            <form asp-action="DownloadReport" method="get">
+                <button type="submit" class="btn btn-outline-success">
+                    <i class="bi bi-file-earmark-arrow-down me-1"></i> Download Report
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==============================
+         TIER SUMMARY MODAL
+         Shows details of tier levels and payment overview
+         ============================== -->
+    <div class="modal fade" id="tierSummaryModal" tabindex="-1" aria-labelledby="tierSummaryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-white text-dark">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="tierSummaryModalLabel">Your Tier & Payment Summary</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <h5 class="text-primary mb-3">
+                        🏆 Your Current Tier:
+                        <span class="badge bg-primary">@ViewBag.UserTier</span>
+                    </h5>
+
+                    <p class="text-muted">
+                        Each tier reflects your contribution and purchases with EasyGamesStore.
+                        Higher tiers unlock better discounts and early access privileges.
+                    </p>
+
+                    <!-- Table describing each tier level -->
+                    <table class="table table-striped align-middle mt-3">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tier</th>
+                                <th>Required Total Profit</th>
+                                <th>Benefits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="badge bg-secondary">Bronze</span></td><td>Below $2,000</td><td>Basic membership access.</td></tr>
+                            <tr><td><span class="badge bg-light text-dark">Silver</span></td><td>$2,000 – $4,999</td><td>5% discount on all purchases.</td></tr>
+                            <tr><td><span class="badge bg-warning text-dark">Gold</span></td><td>$5,000 – $9,999</td><td>10% discount + early deal access.</td></tr>
+                            <tr><td><span class="badge bg-info text-dark">Platinum</span></td><td>$10,000+</td><td>15% discount + priority support + exclusives.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Displays user's financial summary -->
+                    <div class="mt-4">
+                        <h5 class="text-primary mb-2">💳 Payment Overview</h5>
+                        <p><strong>Total Orders:</strong> @ViewBag.TotalOrders</p>
+                        <p><strong>Total Before Tax:</strong> $@ViewBag.TotalSpent.ToString("N2")</p>
+                        <p><strong>Tax Paid (10%):</strong> $@((ViewBag.TotalSpent * 0.10m).ToString("N2"))</p>
+                        <p><strong>Total After Tax:</strong> $@((ViewBag.TotalSpent * 1.10m).ToString("N2"))</p>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================
+         SUMMARY CARDS SECTION
+         Quick overview of user stats
+         ============================== -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3"><div class="summary-card p-3 rounded-3 bg-light border"><h6>Total Orders</h6><h3>@ViewBag.TotalOrders</h3></div></div>
+        <div class="col-md-3"><div class="summary-card p-3 rounded-3 bg-light border"><h6>Total Spent</h6><h3>$@ViewBag.TotalSpent.ToString("N2")</h3></div></div>
+        <div class="col-md-3"><div class="summary-card p-3 rounded-3 bg-light border"><h6>Average Order</h6><h3>$@ViewBag.AvgSpent.ToString("N2")</h3></div></div>
+        <div class="col-md-3"><div class="summary-card p-3 rounded-3 bg-light border"><h6>Current Tier</h6><h3><span class="badge bg-primary">@userTier</span></h3></div></div>
+    </div>
+
+    <!-- ==============================
+         SPENDING TREND CHART
+         Interactive line chart of user spending over time
+         ============================== -->
+    <div class="chart-section p-4 rounded-4 mb-4 bg-light border">
+        <h4 class="text-dark mb-3 fw-bold">📈 Spending Over Time</h4>
+        <canvas id="spendingChart" height="120"></canvas>
+    </div>
+
+    <!-- ==============================
+         PURCHASE HISTORY SECTION
+         Displays past orders and details
+         ============================== -->
+    <div class="purchase-history-container p-4 rounded-4 bg-light border">
+        <h2 class="text-dark mb-4 fw-bold">🧾 Purchase History</h2>
+        <div class="purchase-scroll">
+            @if (orders == null || !orders.Any())
+            {
+                <p>You haven’t made any purchases yet.</p>
+            }
+            else
+            {
+                foreach (var order in orders)
+                {
+                    <div class="order-card mb-4 p-3 rounded-3 bg-white border">
+                        <h5>Order ID: <span class="text-primary">@order.Id</span></h5>
+
+                        <!-- Order item details -->
+                        <table class="table table-striped align-middle mt-3">
+                            <thead class="table-light">
+                                <tr><th>Title</th><th>Unit Price</th><th>Quantity</th><th>Subtotal</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in order.Items)
+                                {
+                                    <tr>
+                                        <td>@item.Title</td>
+                                        <td>$@item.UnitPrice.ToString("N2")</td>
+                                        <td>@item.Quantity</td>
+                                        <td>$@item.Subtotal.ToString("N2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="text-end mt-2">
+                            <p>Total: <strong class="text-success">$@order.TotalAfterTax.ToString("N2")</strong></p>
+                            <small class="text-muted">Purchased: @Convert.ToDateTime(order.CreatedAt).ToShortDateString()</small>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ==============================
+     SPENDING TREND CHART SCRIPT
+     Renders line chart using Chart.js
+     ============================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const orders = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(orders));
+    if (orders && orders.length > 0) {
+        const ctx = document.getElementById('spendingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: orders.map(o => new Date(o.CreatedAt).toLocaleDateString()).reverse(),
+                datasets: [{
+                    label: 'Total After Tax ($)',
+                    data: orders.map(o => o.TotalAfterTax).reverse(),
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13,110,253,0.15)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: '#000' } } },
+                scales: {
+                    x: { ticks: { color: '#000' }, grid: { color: '#e0e0e0' } },
+                    y: { ticks: { color: '#000' }, grid: { color: '#e0e0e0' } }
+                }
+            }
+        });
+    }
+</script>
+
+<!-- ==============================
+     PAGE STYLES
+     ============================== -->
+<style>
+    body {
+        background-color: #f8f9fa;
+        color: #000;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow-y: auto;
+        min-height: 100vh;
+    }
+
+    .avatar-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 10px rgba(13,110,253,0.2);
+        transition: 0.3s ease;
+    }
+
+    .purchase-scroll {
+        max-height: 60vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #0d6efd #f8f9fa;
+    }
+
+    footer {
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        padding: 1rem 0;
+        margin-top: auto;
+        font-size: 0.95rem;
+    }
+</style>

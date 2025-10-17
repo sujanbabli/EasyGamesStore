@@ -1,0 +1,198 @@
+﻿@model EasyGamesStore.Models.Shop
+
+@{
+    // Sets the page title that appears in the browser tab
+    ViewData["Title"] = "Edit Shop";
+}
+
+<!-- ===============================
+     HEADER SECTION
+     =============================== -->
+<!--
+     The header visually identifies the page and provides context.
+     It includes a gradient background consistent with the rest of the admin interface.
+-->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <!-- Main title and subtitle -->
+            <h2 class="fw-bold text-white mb-1">🛠️ Edit Shop</h2>
+            <p class="text-light mb-0">Update shop details and proprietor information.</p>
+        </div>
+
+        <!-- Displays current date to show when the form was accessed -->
+        <span class="badge bg-light text-dark">
+            Last Updated: @DateTime.Now.ToString("dd MMM yyyy")
+        </span>
+    </div>
+</div>
+
+<!-- ===============================
+     MAIN CONTENT AREA
+     =============================== -->
+<!--
+     The main card container where the form is displayed.
+     It uses a white background and rounded corners to maintain a clean UI style.
+-->
+<div class="container bg-white rounded-4 shadow-sm p-4 fade-in my-5" style="max-width: 700px;">
+    <h4 class="fw-bold text-primary mb-4">✏️ Update Shop Details</h4>
+
+    <!-- ===============================
+         EDIT SHOP FORM
+         =============================== -->
+    <!--
+         Form posts back to the Edit action method with the shop model data.
+         Validation messages are handled via ASP.NET Core’s model validation.
+    -->
+    <form asp-action="Edit" method="post">
+        <!-- Displays any validation errors at the top of the form -->
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!-- Hidden field to preserve the Shop ID -->
+        <input type="hidden" asp-for="Id" />
+
+        <!-- ===============================
+             SHOP NAME INPUT
+             =============================== -->
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="Name" class="form-control border-secondary" placeholder="Enter shop name" />
+            <span asp-validation-for="Name" class="text-danger small"></span>
+        </div>
+
+        <!-- ===============================
+             ADDRESS INPUT
+             =============================== -->
+        <div class="mb-3">
+            <label asp-for="Address" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="Address" class="form-control border-secondary" placeholder="Enter address" />
+            <span asp-validation-for="Address" class="text-danger small"></span>
+        </div>
+
+        <!-- ===============================
+             PHONE INPUT
+             =============================== -->
+        <div class="mb-3">
+            <label asp-for="Phone" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="Phone" class="form-control border-secondary" placeholder="Enter contact number" />
+            <span asp-validation-for="Phone" class="text-danger small"></span>
+        </div>
+
+        <!-- ===============================
+             PROPRIETOR EMAIL INPUT
+             =============================== -->
+        <div class="mb-4">
+            <label asp-for="ProprietorEmail" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="ProprietorEmail" class="form-control border-secondary" placeholder="Enter proprietor email" />
+            <span asp-validation-for="ProprietorEmail" class="text-danger small"></span>
+        </div>
+
+        <!-- ===============================
+             ACTION BUTTONS
+             =============================== -->
+        <div class="d-flex align-items-center">
+            <!-- Primary button to submit form and save changes -->
+            <button type="submit" class="btn btn-primary me-2 px-4 shadow-sm">💾 Save Changes</button>
+
+            <!-- Secondary button to navigate back to the shop list without saving -->
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- ===============================
+     CLIENT-SIDE VALIDATION
+     =============================== -->
+@section Scripts {
+    <!--
+         Enables jQuery Unobtrusive Validation to show errors instantly
+         before the form is submitted to the server.
+    -->
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<!-- ===============================
+     PAGE STYLES
+     =============================== -->
+<style>
+    /* Base body styling: consistent with white-theme admin UI */
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header section with gradient and shadow for visual identity */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Input field styling: rounded edges and soft focus glow */
+    .form-control {
+        border-radius: 8px;
+        padding: 10px 12px;
+        transition: 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13, 110, 253, 0.25);
+        }
+
+    /* Button base design */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    /* Primary button (Save) */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
+        }
+
+    /* Secondary outline (Cancel) */
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Fade-in animation for page content */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Accent heading color */
+    h4 {
+        color: #0d6efd;
+    }
+</style>

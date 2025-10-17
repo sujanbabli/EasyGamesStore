@@ -1,0 +1,121 @@
+﻿@model IEnumerable<dynamic>
+@{
+    // Set the page title that appears on the browser tab and layout header
+    ViewData["Title"] = "Recipients";
+}
+
+<!--
+    This page displays a list of all users who received a specific message.
+    It shows information such as their ID, email, tier level, whether they have read the message,
+    and the time the message was read.
+-->
+<div class="container bg-white text-dark rounded-4 p-4 shadow-sm mt-5 mb-5 border">
+
+    <!-- Page Heading -->
+    <!-- The title includes the name of the message dynamically retrieved from ViewBag -->
+    <h2 class="fw-bold mb-4" style="color:#0d1b2a;">
+        Recipients for: <span class="text-primary">@ViewBag.MessageTitle</span>
+    </h2>
+
+    <!-- If there are no recipients, display a message instead of a table -->
+    @if (!Model.Any())
+    {
+        <p class="text-muted">No recipients found for this message.</p>
+    }
+    else
+    {
+        <!-- Table displaying recipient details -->
+        <div class="table-responsive">
+            <table class="table table-striped align-middle text-center border">
+                <thead class="table-primary">
+                    <tr>
+                        <th>User ID</th>
+                        <th>Email</th>
+                        <th>Tier</th>
+                        <th>Status</th>
+                        <th>Read At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <!-- User unique identifier -->
+                            <td>@r.UserId</td>
+
+                            <!-- User email address -->
+                            <td>@r.Email</td>
+
+                            <!-- Tier badge showing the user's membership level -->
+                            <td>
+                                <span class="badge
+                                                    @(r.Tier == "Platinum" ? "bg-primary" :
+                                                                                    r.Tier == "Gold" ? "bg-warning text-dark" :
+                                                                                    r.Tier == "Silver" ? "bg-secondary" :
+                                                                                    "bg-light text-dark")">
+                            @r.Tier
+                        </span>
+                    </td>
+
+                            <!-- Read or Unread status -->
+                            <td class="@(r.IsRead ? "text-success fw-semibold" : "text-warning fw-semibold")">
+                                @(r.IsRead ? "Read" : "Unread")
+                            </td>
+
+                            <!-- Date and time the message was read (or a dash if unread) -->
+                            <td>@(r.ReadAt?.ToLocalTime().ToString("g") ?? "-")</td>
+                        </tr>
+                                }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Navigation button to return to the main Messages list -->
+    <a asp-action="Index" class="btn btn-outline-primary mt-3">← Back to Messages</a>
+</div>
+
+<!-- Custom White Theme Styling -->
+<style>
+    body {
+        background-color: #f9fafb;
+        color: #212529;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h2 {
+        color: #0d1b2a;
+        font-weight: 700;
+    }
+
+    /* Add hover highlight to table rows */
+    .table-striped > tbody > tr:hover {
+        background-color: #e9f2ff;
+        transition: 0.2s;
+    }
+
+    /* Style for the 'Back' button */
+    .btn-outline-primary {
+        border: 1px solid #0d6efd;
+        color: #0d6efd;
+        border-radius: 8px;
+        transition: 0.2s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+    /* Style for tier badges (Bronze, Silver, Gold, Platinum) */
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.45em 0.7em;
+        border-radius: 0.5rem;
+    }
+
+    /* Adds subtle border around the main container */
+    .container {
+        border: 1px solid #dee2e6;
+    }
+</style>

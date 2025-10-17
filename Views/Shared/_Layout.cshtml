@@ -1,0 +1,259 @@
+﻿@using EasyGamesStore.Data
+@using EasyGamesStore.Models
+@using Microsoft.AspNetCore.Identity
+@inject IHttpContextAccessor HttpContextAccessor
+@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
+
+@{
+    // Access the user's session to retrieve the cart data (if any)
+    var session = HttpContextAccessor.HttpContext?.Session;
+
+    // Attempt to deserialize the cart object from JSON stored in session
+    var cart = session?.GetObjectFromJson<List<CartItem>>("Cart") ?? new List<CartItem>();
+
+    // Calculate the total quantity of items in the user's cart
+    var cartCount = cart.Sum(c => c.Quantity);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EasyGamesStore</title>
+
+    <!-- Load Bootstrap, custom CSS, and icon libraries -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/EasyGamesStore.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+    <!-- Inline CSS for consistent theming across layout -->
+    <style>
+        /* NAVBAR STYLES */
+        .navbar-custom {
+            background: linear-gradient(90deg, #0d1b2a, #1b2a47);
+            border-bottom: 1px solid #0d6efd;
+        }
+
+            .navbar-custom .navbar-brand,
+            .navbar-custom .nav-link {
+                color: #e9eef7;
+                font-weight: 600;
+                transition: color 0.2s ease-in-out;
+            }
+
+                .navbar-custom .nav-link:hover,
+                .navbar-custom .nav-link:focus {
+                    color: #0d6efd;
+                }
+
+            .navbar-custom .navbar-toggler {
+                border-color: #0d6efd;
+            }
+
+            .navbar-custom .navbar-toggler-icon {
+                background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' ... %3E");
+            }
+
+        /* FOOTER */
+        footer.footer {
+            background: #0d1b2a;
+            color: #e9eef7;
+            padding: 1rem 0;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+            footer.footer a {
+                color: #0d6efd;
+                text-decoration: none;
+            }
+
+                footer.footer a:hover {
+                    text-decoration: underline;
+                }
+
+        /* CART BADGE STYLE */
+        #cart-count-badge {
+            font-size: 0.75rem;
+            position: relative;
+            top: -11px;
+        }
+
+        /* ICON ALIGNMENT */
+        .navbar-nav .nav-link i {
+            position: relative;
+            top: 1px;
+        }
+
+        /* UNREAD MESSAGE BADGE (for inbox) */
+        .unread-badge {
+            font-size: 0.7rem;
+            position: absolute;
+            top: 0;
+            right: -8px;
+            border-radius: 50%;
+            padding: 0.3em 0.45em;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- MAIN NAVIGATION BAR -->
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-custom navbar-dark box-shadow mb-3">
+            <div class="container-fluid">
+
+                <!-- Dynamic brand link based on user role -->
+                @{
+                    string brandController = "Home";
+                    string brandAction = "Index";
+
+                    if (User.Identity?.IsAuthenticated == true)
+                    {
+                        if (User.IsInRole("Proprietor"))
+                        {
+                            // Proprietors are redirected to their shop dashboard
+                            brandController = "ShopDashboard";
+                            brandAction = "Index";
+                        }
+                        else if (User.IsInRole("Owner"))
+                        {
+                            // Owners are redirected to the main dashboard
+                            brandController = "Home";
+                            brandAction = "Index";
+                        }
+                    }
+                }
+
+                <a class="navbar-brand" asp-controller="@brandController" asp-action="@brandAction">
+                    EasyGamesStore
+                </a>
+
+                <!-- Mobile navbar toggle button -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarMain" aria-controls="navbarMain"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Main navigation links -->
+                <div class="collapse navbar-collapse justify-content-between" id="navbarMain">
+                    <ul class="navbar-nav">
+
+                        <!-- OWNER NAVIGATION OPTIONS -->
+                        @if (User.IsInRole("Owner"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="StockItems" asp-action="Index">Manage Stock</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Manage Users</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Shops" asp-action="Index">Manage Shops</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Shop" asp-action="UserProfitReport">User Profit Report</a></li>
+                        }
+
+                        <!-- PROPRIETOR NAVIGATION OPTIONS -->
+                        @if (User.IsInRole("Proprietor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="ShopStocks" asp-action="Index">
+                                    <i class="bi bi-box-seam me-1"></i> My Shop Stock
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="ShopDashboard" asp-action="Index">
+                                    <i class="bi bi-shop me-1"></i> My Shop
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="ShopPOS" asp-action="Index">
+                                    💰 POS Sales
+                                </a>
+                            </li>
+                        }
+
+                        <!-- REGULAR USER NAVIGATION OPTIONS -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("User"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Shop" asp-action="Index">
+                                    <i class="bi bi-bag me-1"></i> Online Shop
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Shop" asp-action="MySalesHistory">
+                                    <i class="bi bi-clock-history me-1"></i> My Sales
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        }
+
+                        <!-- VISITOR NAVIGATION (NOT LOGGED IN) -->
+                        @if (!User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Shop" asp-action="Index">Online Shop</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- RIGHT-SIDE NAVIGATION ELEMENTS -->
+                    <ul class="navbar-nav align-items-center">
+
+                        <!-- CUSTOMER-SPECIFIC ELEMENTS: INBOX + CART -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("User"))
+                        {
+                            <!-- Inbox with unread count badge rendered via ViewComponent -->
+                            <li class="nav-item me-3">
+                                <a class="nav-link text-light d-flex align-items-center gap-1 position-relative"
+                                   asp-controller="Inbox" asp-action="Index">
+                                    <i class="bi bi-envelope"></i> Inbox
+                                    @await Component.InvokeAsync("InboxUnreadCount")
+                                </a>
+                            </li>
+
+                            <!-- Shopping cart with dynamic count badge -->
+                            <li class="nav-item me-3">
+                                <a class="nav-link d-flex align-items-center" asp-controller="Shop" asp-action="Cart">
+                                    <i class="bi bi-cart-fill me-1"></i> Cart
+                                    <span id="cart-count-badge" class="badge bg-danger">@cartCount</span>
+                                </a>
+                            </li>
+                        }
+
+                        <!-- LOGIN / LOGOUT PARTIAL VIEW -->
+                        <li class="nav-item">
+                            <partial name="_LoginPartial" />
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- GLOBAL FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            &copy; 2025 - EasyGamesStore
+        </div>
+    </footer>
+
+    <!-- Load JavaScript dependencies -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

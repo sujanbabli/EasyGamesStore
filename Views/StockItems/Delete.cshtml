@@ -1,0 +1,137 @@
+﻿@model EasyGamesStore.Models.StockItem
+
+@{
+    ViewData["Title"] = "Delete Stock Item";
+}
+
+<!-- ========== HEADER ========== -->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold text-white mb-1">🗑️ Delete Stock Item</h2>
+            <p class="text-light mb-0">Confirm before removing this item permanently.</p>
+        </div>
+        <span class="badge bg-light text-dark">Action Date: @DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="container bg-white rounded-4 shadow-sm p-4 fade-in my-5" style="max-width: 850px;">
+    <h4 class="fw-bold text-danger mb-3">⚠️ Are you sure you want to delete this item?</h4>
+    <p class="text-muted mb-4">Once deleted, this action cannot be undone.</p>
+    <hr />
+
+    <!-- Product Info -->
+    <dl class="row mb-4">
+        <dt class="col-sm-4 fw-semibold text-secondary">Title</dt>
+        <dd class="col-sm-8">@Model?.Title</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Category</dt>
+        <dd class="col-sm-8">@Model?.Category</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Price</dt>
+        <dd class="col-sm-8">@Model?.Price.ToString("C")</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Quantity</dt>
+        <dd class="col-sm-8">@Model?.Quantity</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Image</dt>
+        <dd class="col-sm-8">
+            <img src="@(!string.IsNullOrEmpty(Model?.ImageUrl) ? Model.ImageUrl : Url.Content("~/images/placeholder.png"))"
+                 alt="@Model?.Title"
+                 class="img-fluid rounded-3 border shadow-sm"
+                 style="max-width: 250px;" />
+        </dd>
+    </dl>
+
+    <!-- Confirmation Form -->
+    <form asp-action="Delete" method="post" class="mt-4">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="d-flex align-items-center">
+            <button type="submit" class="btn btn-danger px-4 me-2 shadow-sm">🗑️ Delete</button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- ========== STYLES ========== -->
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header Bar */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Description List */
+    dt {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    dd {
+        color: #212529;
+        margin-bottom: 12px;
+        font-weight: 500;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.4);
+        }
+
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    h4 {
+        color: #dc3545;
+    }
+</style>

@@ -1,0 +1,165 @@
+﻿@model EasyGamesStore.Models.Shop
+
+@{
+    // Defines the page title for browser tabs and the layout’s <title> tag
+    ViewData["Title"] = "Create Shop";
+}
+
+<!-- ===============================
+     PAGE CONTAINER
+     =============================== -->
+<div class="container bg-white text-dark p-4 rounded-4 shadow-sm mt-5 mb-5 border" style="max-width: 600px;">
+
+    <!-- Page Heading -->
+    <h2 class="fw-bold mb-4" style="color: #0d1b2a;">🏪 Create a New Shop</h2>
+
+    <!-- ===============================
+         TEMP DATA MESSAGE
+         =============================== -->
+    <!--
+        Displays a temporary message passed from the controller using TempData["Message"],
+        often used to show success or informational notifications after an action.
+    -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info">@TempData["Message"]</div>
+    }
+
+    <!-- ===============================
+         SHOP CREATION FORM
+         =============================== -->
+    <!--
+        This form posts data to the Create action method of the Shop controller.
+        It includes model validation and form fields for basic shop details.
+    -->
+    <form asp-action="Create">
+        <!-- Validation summary displays any model-level validation errors -->
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!-- ===============================
+             SHOP NAME INPUT
+             =============================== -->
+        <div class="mb-3">
+            <!-- Automatically binds to the 'Name' property of the Shop model -->
+            <label asp-for="Name" class="form-label fw-semibold"></label>
+            <input asp-for="Name" class="form-control border-secondary" placeholder="Enter shop name" />
+            <!-- Displays any validation errors specific to the Name field -->
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <!-- ===============================
+             SHOP ADDRESS INPUT
+             =============================== -->
+        <div class="mb-3">
+            <label asp-for="Address" class="form-label fw-semibold"></label>
+            <input asp-for="Address" class="form-control border-secondary" placeholder="Enter shop address" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <!-- ===============================
+             SHOP PHONE INPUT
+             =============================== -->
+        <div class="mb-4">
+            <label asp-for="Phone" class="form-label fw-semibold"></label>
+            <input asp-for="Phone" class="form-control border-secondary" placeholder="04XXXXXXXX" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <!-- ===============================
+             ACTION BUTTONS
+             =============================== -->
+        <div class="d-flex align-items-center">
+            <!-- Submits the form to create a new shop -->
+            <button type="submit" class="btn btn-primary me-2 px-4">✅ Create</button>
+
+            <!-- Navigates back to the shop list without submitting the form -->
+            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+<!-- ===============================
+     WHITE THEME CUSTOM STYLES
+     =============================== -->
+<style>
+    /*
+           Page-wide styling for a clean, modern white interface suitable for admin dashboards.
+           Improves user experience with visual consistency and soft color contrast.
+        */
+    body {
+        background-color: #f9fafb; /* Light gray background for depth */
+        color: #212529; /* Dark gray text for readability */
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow-x: hidden; /* Prevents horizontal scrolling issues */
+    }
+
+    /* Title heading styling */
+    h2 {
+        font-weight: 700;
+        color: #0d1b2a; /* Deep blue tone for emphasis */
+    }
+
+    /* Primary button styling: vibrant blue tone for main actions */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+        /* Hover effect for better interactivity */
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+        }
+
+    /* Outline button styling for secondary actions */
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Form inputs: rounded corners and focus highlights */
+    .form-control {
+        border-radius: 8px;
+        background-color: #ffffff;
+        color: #212529;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 6px rgba(13, 110, 253, 0.25);
+        }
+
+    /* Alert styling for TempData messages (informational popups) */
+    .alert {
+        border-radius: 8px;
+        color: #084298;
+        background-color: #cfe2ff;
+        border: 1px solid #b6d4fe;
+    }
+
+    /* Adds subtle border to container for structure */
+    .container {
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+<!-- ===============================
+     CLIENT-SIDE VALIDATION SCRIPTS
+     =============================== -->
+@section Scripts {
+    <!--
+         Enables client-side validation (jQuery Unobtrusive Validation).
+         This ensures validation messages show instantly before form submission.
+    -->
+    <partial name="_ValidationScriptsPartial" />
+}

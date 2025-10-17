@@ -1,0 +1,141 @@
+﻿@model List<EasyGamesStore.Models.CartItem>
+@{
+    // Set page title to "Shopping Cart" for browser tab
+    ViewData["Title"] = "Shopping Cart";
+
+    // Calculate total amount by summing Price * Quantity for each cart item
+    var total = Model.Sum(c => c.Price * c.Quantity);
+
+    // Set a background image URL for the cart page
+    string backgroundImageUrl = "https://i0.wp.com/thefreebieguy.com/wp-content/uploads/2021/10/Image-from-iOS-429-scaled.jpg?fit=2560%2C1440&ssl=1";
+}
+
+<!-- Cart page wrapper with background image -->
+<div class="cart-page" style="background-image: url('@backgroundImageUrl'); background-size: cover; background-position: center; padding: 3rem 1rem; min-height: 100vh;">
+
+    <!-- Container for cart content with semi-transparent dark background -->
+    <div class="container bg-dark bg-opacity-75 text-light p-4 rounded-4 shadow-lg">
+        <h2 class="mb-4 text-gradient-primary">Your Shopping Cart</h2>
+
+        <!-- Display any error message passed via TempData -->
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-warning">
+                @TempData["Error"]
+            </div>
+        }
+
+        <!-- Show empty cart message if there are no items -->
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                Your cart is empty. Start browsing <a asp-action="Index" asp-controller="Shop" class="text-decoration-underline text-info">here</a>.
+            </div>
+        }
+        else
+        {
+            <!-- Table displaying cart items -->
+            <table class="table table-dark table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Title</td>
+                            <td>@item.Price.ToString("C")</td>
+                            <td>@item.Quantity</td>
+                            <td>@(item.Price* item.Quantity).ToString("C")</td>
+                            <td>
+                                <!-- Buttons to increase or decrease quantity -->
+                                <form asp-action="UpdateQuantity" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@item.StockItemId" />
+                                    <button type="button" class="btn btn-sm btn-secondary plus-btn" data-id="@item.StockItemId">+</button>
+                                    <button type="button" class="btn btn-sm btn-secondary minus-btn" data-id="@item.StockItemId">–</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Display total price -->
+            <p class="fs-5 mt-3">
+                <strong>Total: </strong>
+                <span class="text-gradient-secondary">@total.ToString("C")</span>
+            </p>
+
+            <!-- Actions: checkout, continue shopping, clear cart -->
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                <a asp-action="Checkout" class="btn btn-success">Checkout</a>
+                <a asp-action="Index" asp-controller="Shop" class="btn btn-secondary">Continue Shopping</a>
+
+                <form asp-action="ClearCart" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Clear Cart</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Function to update the cart count badge in navbar
+            function updateCartCount(count) {
+                $('#cart-count-badge').text(count);
+            }
+
+            // Attach click events for plus and minus buttons
+            $('.plus-btn, .minus-btn').click(function () {
+                var id = $(this).data('id');
+                var change = $(this).hasClass('plus-btn') ? 'plus' : 'minus';
+
+                // Send AJAX request to update quantity
+                $.post('/Shop/UpdateQuantityAjax', { id: id, change: change }, function (data) {
+                    updateCartCount(data.cartCount); // update navbar badge
+                    if (data.message) {
+                        alert(data.message); // optional alert if returned
+                    }
+                    location.reload(); // refresh table to show updated quantities
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    /* Gradient text styles for headings and totals */
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #fff,#fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-secondary {
+        background: linear-gradient(90deg, #fff, #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Align table content vertically */
+    .cart-page .table th, .cart-page .table td {
+        vertical-align: middle;
+    }
+
+    /* Styling for plus/minus buttons */
+    .plus-btn, .minus-btn {
+        width: 2rem;
+        text-align: center;
+        padding: 0;
+    }
+</style>

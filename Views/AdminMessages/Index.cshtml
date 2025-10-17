@@ -1,0 +1,160 @@
+﻿@model IEnumerable<EasyGamesStore.Models.AppMessage>
+@{
+    // Set the page title for display and browser tab
+    ViewData["Title"] = "Messages";
+}
+
+<!--
+    This page displays a list of all messages that have been created and sent
+    by the Owner or Admin. It provides an overview of each message’s details,
+    such as title, category, target audience, recipients, and date sent.
+-->
+<div class="container bg-white text-dark p-4 rounded-4 shadow-sm mt-5 mb-5 border">
+
+    <!-- Header Section -->
+    <!-- Displays the title of the page and a button to create a new message -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold" style="color:#0d1b2a;">Messages</h2>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">New Message</a>
+    </div>
+
+    <!-- Success Message Notification -->
+    <!-- Displays a confirmation or success message from TempData after actions like sending or deleting a message -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success mb-3">@TempData["Message"]</div>
+    }
+
+    <!-- Table Section -->
+    <!-- The table presents all messages with their key information in a clean tabular layout -->
+    <div class="table-responsive rounded-3 shadow-sm">
+        <table class="table table-striped align-middle text-center mb-0 border">
+            <thead class="table-primary">
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Target</th>
+                    <th>Recipients Sent</th>
+                    <th>Sent On</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <!-- Table Body -->
+            <tbody>
+                @foreach (var message in Model)
+                {
+                    // Calculate how many users received this message.
+                    var recipientCount = message.Recipients?.Count() ?? 0;
+
+                    <tr>
+                        <!-- Message Title -->
+                        <td>@message.Title</td>
+
+                        <!-- Message Category (e.g., Promotion, Notification) -->
+                        <td>
+                            <span class="badge bg-info text-dark">@message.Category</span>
+                        </td>
+
+                        <!-- Target Audience (e.g., All Users, Gold, Silver) -->
+                        <td>
+                            <span class="badge bg-secondary">@message.TargetTier</span>
+                        </td>
+
+                        <!-- Number of recipients this message was sent to -->
+                        <td>@recipientCount</td>
+
+                        <!-- Date and time when the message was created -->
+                        <td>@message.CreatedAt.ToLocalTime().ToString("g")</td>
+
+                        <!-- Action button to view detailed recipient list for this message -->
+                        <td>
+                            <a asp-action="Recipients" asp-route-id="@message.Id" class="btn btn-sm btn-outline-primary">
+                                View Recipients
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--
+    Custom Styles (White Theme)
+    These styles create a bright, clean, and professional interface
+    with light colors, rounded edges, and subtle hover effects.
+-->
+<style>
+    body {
+        background-color: #f9fafb;
+        color: #212529;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow-x: hidden;
+    }
+
+    h2 {
+        font-weight: 700;
+        color: #0d1b2a;
+    }
+
+    /* Primary button (New Message) styling */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+        }
+
+    /* Outline button (View Recipients) styling */
+    .btn-outline-primary {
+        border: 1px solid #0d6efd;
+        color: #0d6efd;
+        border-radius: 8px;
+        transition: 0.2s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+    /* Table design with alternating row colors and hover highlights */
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table-striped > tbody > tr:nth-of-type(odd) {
+        background-color: #f8f9fa;
+    }
+
+    .table-striped > tbody > tr:hover {
+        background-color: #e9f2ff;
+        transition: 0.2s;
+    }
+
+    /* Notification alert box */
+    .alert {
+        border-radius: 8px;
+        color: #084298;
+        background-color: #cfe2ff;
+        border: 1px solid #b6d4fe;
+    }
+
+    /* Badge design for category and tier indicators */
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.45em 0.7em;
+    }
+
+    /* Light border for the container to separate it visually from the background */
+    .container {
+        border: 1px solid #dee2e6;
+    }
+</style>

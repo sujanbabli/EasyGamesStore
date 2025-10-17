@@ -1,0 +1,17 @@
+﻿@model int
+
+<!--
+    This view component displays a small badge indicating the number of unread messages.
+    It is designed to be used inside the navigation bar or next to an Inbox icon.
+-->
+@if (Model > 0)
+{
+    <!--
+        If there are unread messages (Model > 0), display the count as a circular badge.
+        The badge is positioned absolutely so that it overlaps slightly on the icon or menu item.
+    -->
+    <span class="position-absolute badge rounded-pill bg-warning text-dark"
+          style="top: 1px; left: 98%; transform: translate(-50%, 0); font-size: 0.7rem; padding: 0.25em 0.5em;">
+        @Model
+    </span>
+}

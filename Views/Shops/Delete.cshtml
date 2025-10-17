@@ -1,0 +1,167 @@
+﻿@model EasyGamesStore.Models.Shop
+
+@{
+    // Sets the browser page title dynamically for better user navigation context
+    ViewData["Title"] = "Delete Shop";
+}
+
+<!-- ===============================
+     HEADER SECTION
+     =============================== -->
+<!--
+     The header bar provides context about the current action.
+     It also includes a subtle gradient and a timestamp showing when the page was generated.
+-->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <!-- Main page heading -->
+            <h2 class="fw-bold text-white mb-1">🗑️ Delete Shop</h2>
+            <p class="text-light mb-0">Confirm deletion of the selected shop record.</p>
+        </div>
+
+        <!-- Displays the current date for visual reference -->
+        <span class="badge bg-light text-dark">
+            Updated: @DateTime.Now.ToString("dd MMM yyyy")
+        </span>
+    </div>
+</div>
+
+<!-- ===============================
+     MAIN CONTENT AREA
+     =============================== -->
+<div class="container bg-white rounded-4 shadow-sm p-4 fade-in my-5" style="max-width: 700px;">
+    <!-- Heading and warning message -->
+    <h4 class="fw-bold text-danger mb-3">⚠️ Are you sure you want to delete this shop?</h4>
+    <p class="text-muted mb-4">This action cannot be undone.</p>
+
+    <!--
+         Displays the details of the shop that is about to be deleted.
+         Helps the admin confirm that they are removing the correct record.
+    -->
+    <dl class="row border rounded-3 p-3 bg-light mb-4">
+        <dt class="col-sm-4 fw-semibold text-secondary">Shop Name</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Name)</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Address</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Address)</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Phone</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Phone)</dd>
+
+        <dt class="col-sm-4 fw-semibold text-secondary">Proprietor Email</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.ProprietorEmail)</dd>
+    </dl>
+
+    <!-- ===============================
+         DELETION FORM
+         =============================== -->
+    <!--
+         The form posts to the Delete action method when the user confirms the deletion.
+         It uses a hidden field for the shop ID to ensure the correct record is targeted.
+    -->
+    <form asp-action="Delete" method="post" class="d-flex align-items-center justify-content-between mt-4">
+        <input type="hidden" asp-for="Id" />
+
+        <div>
+            <!--
+                 Primary action: permanently delete the record.
+                 Uses a red “danger” button for emphasis.
+            -->
+            <button type="submit" class="btn btn-danger px-4 shadow-sm">
+                Delete Permanently
+            </button>
+
+            <!--
+                 Secondary action: cancels and redirects back to the main shop list.
+            -->
+            <a asp-action="Index" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- ===============================
+     PAGE STYLING
+     =============================== -->
+<style>
+    /* Overall page look: light background, clean readable font */
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header section with gradient and soft shadow for elevation */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky; /* Keeps the header visible while scrolling */
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Base button style with soft rounded corners */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    /* Delete (danger) button for destructive actions */
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+
+        /* Hover effect adds depth and stronger visual feedback */
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.4);
+        }
+
+    /* Cancel (secondary outline) button for non-destructive actions */
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+        border-radius: 8px;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Fade-in animation for the card entry */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Label and value pair styling for consistency */
+    dl dt {
+        color: #495057;
+    }
+
+    dl dd {
+        color: #212529;
+        font-weight: 500;
+    }
+
+    /* Light background panel for details box */
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>

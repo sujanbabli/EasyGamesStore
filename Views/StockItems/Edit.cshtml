@@ -1,0 +1,210 @@
+﻿@model EasyGamesStore.Models.StockItem
+
+@{
+    ViewData["Title"] = "Edit Stock Item";
+}
+
+<!-- ========== HEADER ========== -->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold text-white mb-1">✏️ Edit Stock Item</h2>
+            <p class="text-light mb-0">Update and manage existing product details.</p>
+        </div>
+        <span class="badge bg-light text-dark">Last Updated: @DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="container bg-white rounded-4 shadow-sm p-4 fade-in my-5" style="max-width: 900px;">
+    <h4 class="fw-bold text-primary mb-3">🛠️ Update Stock Details</h4>
+    <hr />
+
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="Id" />
+
+        <!-- Title -->
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="Title" class="form-control border-secondary" placeholder="Enter item title" />
+            <span asp-validation-for="Title" class="text-danger small"></span>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-3">
+            <label asp-for="Category" class="form-label fw-semibold text-dark"></label>
+            <select asp-for="Category" class="form-select border-secondary">
+                <option value="Books">Books</option>
+                <option value="Games">Games</option>
+                <option value="Toys">Toys</option>
+            </select>
+            <span asp-validation-for="Category" class="text-danger small"></span>
+        </div>
+
+        <!-- Price -->
+        <div class="mb-3">
+            <label asp-for="Price" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="Price" class="form-control border-secondary" placeholder="Enter selling price" />
+            <span asp-validation-for="Price" class="text-danger small"></span>
+        </div>
+
+        <!-- Quantity -->
+        <div class="mb-3">
+            <label asp-for="Quantity" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="Quantity" class="form-control border-secondary" placeholder="Enter quantity" />
+            <span asp-validation-for="Quantity" class="text-danger small"></span>
+        </div>
+
+        <!-- Image URL -->
+        <div class="mb-3">
+            <label asp-for="ImageUrl" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="ImageUrl" class="form-control border-secondary" placeholder="https://example.com/product.jpg" />
+            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="row mb-3">
+            <div class="col-md-6 form-check">
+                <input asp-for="IsNew" class="form-check-input" type="checkbox" />
+                <label asp-for="IsNew" class="form-check-label">Mark as New</label>
+            </div>
+            <div class="col-md-6 form-check">
+                <input asp-for="IsOnSale" class="form-check-input" type="checkbox" />
+                <label asp-for="IsOnSale" class="form-check-label">Mark as On Sale</label>
+            </div>
+        </div>
+
+        <!-- Original Price -->
+        <div class="mb-3">
+            <label asp-for="OriginalPrice" class="form-label fw-semibold text-dark"></label>
+            <input asp-for="OriginalPrice" class="form-control border-secondary" placeholder="Enter original price (if discounted)" />
+            <span asp-validation-for="OriginalPrice" class="text-danger small"></span>
+        </div>
+
+        <!-- Short Description -->
+        <div class="mb-3">
+            <label asp-for="ShortDescription" class="form-label fw-semibold text-dark"></label>
+            <textarea asp-for="ShortDescription" class="form-control border-secondary" rows="3" placeholder="Enter a brief description..."></textarea>
+            <span asp-validation-for="ShortDescription" class="text-danger small"></span>
+        </div>
+
+        <!-- Rating and Review -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="AverageRating" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="AverageRating" type="number" step="0.1" min="0" max="5" class="form-control border-secondary" />
+                <span asp-validation-for="AverageRating" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ReviewCount" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="ReviewCount" type="number" min="0" class="form-control border-secondary" />
+                <span asp-validation-for="ReviewCount" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- Cost Price & Source -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="CostPrice" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="CostPrice" class="form-control border-secondary" placeholder="Enter cost price" />
+                <span asp-validation-for="CostPrice" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Source" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="Source" class="form-control border-secondary" placeholder="Enter supplier/source" />
+                <span asp-validation-for="Source" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- Submit + Back -->
+        <div class="d-flex align-items-center mt-4">
+            <button type="submit" class="btn btn-primary px-4 me-2 shadow-sm">💾 Save Changes</button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Back to List</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<!-- ========== STYLES ========== -->
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header Bar */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Inputs & Focus */
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 12px;
+        transition: 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13, 110, 253, 0.25);
+        }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
+        }
+
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    h4 {
+        color: #0d6efd;
+    }
+</style>

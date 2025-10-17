@@ -1,0 +1,91 @@
+﻿@{
+    // Sets the page title visible in the browser tab and layout header
+    ViewBag.Title = "Create Transfer";
+}
+
+<!-- ===============================
+     PAGE HEADING
+     =============================== -->
+<h2>Create Shop Transfer</h2>
+
+<!-- ===============================
+     TRANSFER FORM
+     =============================== -->
+<!--
+     This form allows an administrator or shop manager to create a new transfer
+     of stock items between shops. The form posts data to the "Create" action
+     in the corresponding controller.
+-->
+<form asp-action="Create" method="post">
+    <!-- ===============================
+         SHOP SELECTION
+         =============================== -->
+    <!--
+         Dropdown list populated dynamically from ViewBag.Shops.
+         Each shop option includes its name and ID.
+         The selected shop determines where the item will be transferred.
+    -->
+    <div class="mb-3">
+        <label class="form-label">Select Shop</label>
+        <select class="form-select" name="shopId" required>
+            <option value="">-- Select Shop --</option>
+            @foreach (var shop in ViewBag.Shops)
+            {
+                <option value="@shop.Id">@shop.Name</option>
+            }
+        </select>
+    </div>
+
+    <!-- ===============================
+         STOCK ITEM SELECTION
+         =============================== -->
+    <!--
+         Lists all available stock items for transfer.
+         The quantity is shown beside each item name to inform the user
+         of current availability before transferring.
+    -->
+    <div class="mb-3">
+        <label class="form-label">Select Stock Item</label>
+        <select class="form-select" name="stockItemId" required>
+            <option value="">-- Select Item --</option>
+            @foreach (var item in ViewBag.StockItems)
+            {
+                <option value="@item.Id">@item.Title (@item.Quantity available)</option>
+            }
+        </select>
+    </div>
+
+    <!-- ===============================
+         QUANTITY INPUT
+         =============================== -->
+    <!--
+         Specifies how many units of the selected stock item should be transferred.
+         The minimum quantity is restricted to 1 to prevent invalid submissions.
+    -->
+    <div class="mb-3">
+        <label class="form-label">Quantity</label>
+        <input type="number" name="quantity" class="form-control" min="1" required />
+    </div>
+
+    <!-- ===============================
+         ACTION BUTTONS
+         =============================== -->
+    <!--
+         "Transfer" submits the form to create a transfer record.
+         "Back" navigates back to the main index without submitting.
+    -->
+    <button type="submit" class="btn btn-success">Transfer</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+<!-- ===============================
+     ERROR MESSAGE HANDLING
+     =============================== -->
+<!--
+     Displays an error alert if the controller sends a message using TempData["Error"],
+     such as when a transfer cannot be processed due to insufficient stock or invalid input.
+-->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+}

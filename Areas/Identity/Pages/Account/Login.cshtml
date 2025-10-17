@@ -1,0 +1,177 @@
+﻿@page
+@model LoginModel
+
+@{
+    // Sets the title of this Razor Page dynamically
+    // This helps the layout or browser tab display "Log in" as the page title
+    ViewData["Title"] = "Log in";
+}
+
+<!--
+    The main container wraps the entire login section and ensures it is vertically centered.
+    I used flexbox alignment to make the form stay in the middle of the screen
+    and maintain a consistent layout on all screen sizes.
+-->
+<div class="container py-5 text-dark" style="min-height:100vh; display:flex; align-items:center; justify-content:center;">
+
+    <!--
+        The card acts as the main form box.
+        It has a shadow and rounded corners for a clean, professional UI.
+        The max-width keeps it compact and user-friendly across devices.
+    -->
+    <div class="card shadow-lg p-4 rounded-4 border-0" style="max-width:400px; width:100%; background-color:#f8f9fa;">
+
+        <!--
+            The heading uses gradient text for a modern and polished look.
+            The text itself is dynamically loaded from the page title above.
+        -->
+        <h2 class="text-center fw-bold text-gradient-primary mb-4">@ViewData["Title"]</h2>
+
+        <!--
+            The form collects the user’s email and password, and sends it to the server when submitted.
+            Method is POST since we’re securely sending credentials.
+        -->
+        <form id="account" method="post">
+
+            <!-- A small title above the form to make it more user-friendly -->
+            <h5 class="text-dark mb-3">Use your account to log in.</h5>
+
+            <!-- Decorative gradient line under the title for a visual break -->
+            <hr class="mx-auto mb-4" style="width:6rem;height:3px;background:linear-gradient(90deg,#0d6efd,#6610f2);border:none;border-radius:1rem;" />
+
+            <!--
+                This area displays validation errors if login fails
+                (e.g., wrong password or missing input fields).
+            -->
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <!-- Email Input Field -->
+            <div class="form-floating mb-3">
+                <!--
+                    Uses 'asp-for' to bind the input to Input.Email from the LoginModel.
+                    The 'autocomplete' helps browsers suggest the user’s stored email.
+                -->
+                <input asp-for="Input.Email"
+                       class="form-control border-secondary-subtle"
+                       autocomplete="username"
+                       aria-required="true"
+                       placeholder="name@example.com" />
+
+                <!-- Label displayed inside the floating input -->
+                <label asp-for="Input.Email">Email</label>
+
+                <!-- Shows validation message if the email format is invalid -->
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <!-- Password Input Field -->
+            <div class="form-floating mb-3">
+                <!--
+                    Binds to Input.Password and hides input characters.
+                    Autocomplete helps autofill passwords for returning users.
+                -->
+                <input asp-for="Input.Password"
+                       class="form-control border-secondary-subtle"
+                       autocomplete="current-password"
+                       aria-required="true"
+                       placeholder="password" />
+
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <!-- Remember Me Checkbox -->
+            <div class="form-check mb-3">
+                <!--
+                    Lets users stay logged in after closing the browser.
+                    The value binds directly to Input.RememberMe.
+                -->
+                <input class="form-check-input" asp-for="Input.RememberMe" />
+                <label class="form-check-label" asp-for="Input.RememberMe">
+                    @Html.DisplayNameFor(m => m.Input.RememberMe)
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mb-3">Log in</button>
+
+            <!-- Helpful Links Below Form -->
+            <div class="text-center">
+                <!-- Forgot Password link redirects to password recovery page -->
+                <p><a id="forgot-password" asp-page="./ForgotPassword" class="text-primary text-decoration-underline">Forgot your password?</a></p>
+
+                <!-- Register link takes the user to account creation page -->
+                <p><a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary text-decoration-underline">Register as a new user</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--
+    Custom CSS for the login page — designed for a clean, soft, and modern appearance.
+-->
+<style>
+    /* Sets a clean white background with readable dark text */
+    body {
+        background-color: #ffffff;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #212529;
+    }
+
+    /* Gradient text effect for headings */
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Base input styling */
+    .form-control {
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+        /* Adds a purple glow and smooth border transition on focus */
+        .form-control:focus {
+            border-color: #6610f2;
+            box-shadow: 0 0 8px rgba(102, 16, 242, 0.3);
+        }
+
+    /* Button styling with gradient and hover animation */
+    .btn-primary {
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        /* Adds slight lift and shadow on hover */
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.25);
+            transform: translateY(-1px);
+        }
+
+    /* Card hover animation for interactive feel */
+    .card {
+        background-color: #f8f9fa;
+        border-radius: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.1);
+        }
+
+    /* Changes link color slightly on hover for better interactivity */
+    a.text-primary:hover {
+        color: #6610f2 !important;
+    }
+</style>
+
+<!--
+    Razor section that includes built-in ASP.NET Core validation scripts.
+    These scripts enable client-side validation without manual JavaScript.
+-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

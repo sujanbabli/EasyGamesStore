@@ -1,0 +1,138 @@
+﻿@model EasyGamesStore.Models.AppMessage
+@{
+    // Set the page title for browser tab and header display
+    ViewData["Title"] = "Compose Message";
+}
+
+<!--
+    This page allows the Owner or Admin to compose and send a message
+    to users (all or by tier) within the EasyGamesStore system.
+    It uses the AppMessage model and posts data to the Create action in the controller.
+-->
+<div class="container bg-white text-dark p-4 rounded-4 shadow-sm mt-5 mb-5 border" style="max-width:900px;">
+    <!-- Page Heading -->
+    <h2 class="fw-bold mb-4" style="color:#0d1b2a;">Compose Message</h2>
+
+    <!-- Message Composition Form -->
+    <form asp-action="Create" method="post">
+
+        <!-- Title Input Field -->
+        <!-- Collects the subject or headline of the message -->
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label fw-semibold"></label>
+            <input asp-for="Title" class="form-control border-secondary" placeholder="Enter message title" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <!-- Category and Target Audience Row -->
+        <!-- Two dropdowns in one row: one for message category, one for target user group -->
+        <div class="row g-3">
+            <!-- Category Dropdown -->
+            <!-- Allows the sender to categorize messages (e.g., promotions, updates, notifications) -->
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Category</label>
+                <select asp-for="Category" class="form-select border-secondary bg-white text-dark">
+                    <option>Promotion</option>
+                    <option>Update</option>
+                    <option>Welcome</option>
+                    <option>Notification</option>
+                    <option>Feedback</option>
+                </select>
+            </div>
+
+            <!-- Target Audience Dropdown -->
+            <!-- Determines which user group receives the message: all users or a specific tier -->
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Target Audience</label>
+                <select asp-for="TargetTier" class="form-select border-secondary bg-white text-dark">
+                    <option value="UsersOnly">All Users</option>
+                    <option>Platinum</option>
+                    <option>Gold</option>
+                    <option>Silver</option>
+                    <option>Bronze</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Message Body Section -->
+        <!-- Uses a textarea to allow HTML formatting for rich messages (headings, bold text, links, etc.) -->
+        <div class="mb-4 mt-3">
+            <label class="form-label fw-semibold">Message (HTML allowed)</label>
+            <textarea asp-for="HtmlBody" rows="8" class="form-control border-secondary"
+                      placeholder="<h3>Exclusive 10% Off!</h3><p>Use code <b>SILVER10</b> ..."></textarea>
+            <span asp-validation-for="HtmlBody" class="text-danger"></span>
+        </div>
+
+        <!-- Action Buttons -->
+        <!-- Includes a primary button to send the message and a secondary button to return to index -->
+        <div class="d-flex align-items-center">
+            <button type="submit" class="btn btn-primary px-4 me-2">Send</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        </div>
+    </form>
+</div>
+
+<!-- Custom Styles for White Theme -->
+<!-- The following CSS provides a clean and modern look with white backgrounds and subtle borders -->
+<style>
+    body {
+        background-color: #f9fafb;
+        color: #212529;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h2 {
+        color: #0d1b2a;
+        font-weight: 700;
+    }
+
+    /* Inputs and dropdowns share a consistent rounded border and smooth focus effect */
+    .form-control, .form-select {
+        border-radius: 8px;
+        background-color: #ffffff;
+        color: #212529;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 6px rgba(13, 110, 253, 0.25);
+        }
+
+    /* Primary button style: solid blue with hover transition */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+        }
+
+    /* Secondary button: outlined with subtle hover background */
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Outer container border for slight visual separation */
+    .container {
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+<!-- Validation Scripts -->
+<!-- Includes built-in ASP.NET Core client-side validation for form inputs -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

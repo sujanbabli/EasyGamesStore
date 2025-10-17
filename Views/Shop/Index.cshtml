@@ -1,0 +1,277 @@
+﻿@model IEnumerable<EasyGamesStore.Models.StockItem>
+@{
+    ViewData["Title"] = "Shop"; // Sets the page title dynamically
+}
+
+<div class="container my-6 py-4">
+
+    <!-- Page Header with Glassy Box -->
+    <header class="mb-5 text-center">
+        <div class="header-box p-4 rounded-4 mx-auto" style="max-width: 900px;">
+            <!-- Main heading with custom font and color -->
+            <h1 class="display-3 fw-bold" style="font-family: 'Poppins', sans-serif; color: white;">
+                Explore Our <span class="text-white">Exclusive Collection</span>
+            </h1>
+            <!-- Subheading describing the shop -->
+            <p class="lead fst-italic mt-2" style="letter-spacing: 0.1em; color: white;">
+                Find the best games, toys, and books with unbeatable prices and real-time stock availability.
+            </p>
+            <!-- Decorative gradient line under heading -->
+            <hr class="mx-auto" style="width: 8rem; height: 4px; background: linear-gradient(90deg, #0d6efd, #6610f2); border: none; border-radius: 2rem;" />
+        </div>
+    </header>
+
+    <!-- Search and Category Filter Form -->
+    <form method="get" asp-action="Index" class="mb-5 d-flex justify-content-center align-items-center gap-3 flex-wrap">
+        <!-- Search Box -->
+        <div class="d-flex align-items-center gap-2">
+            <label for="search" class="fw-semibold mb-0 px-3 py-1 rounded"
+                   style="color: #ffffff; background: linear-gradient(135deg, #0d6efd, #000000); border: 1px solid #0d6efd;">
+                Search Products:
+            </label>
+            <div class="input-group" style="max-width: 300px;">
+                <!-- Input field pre-filled with search term if exists -->
+                <input type="text" id="search" name="search" value="@(ViewBag.SearchTerm ?? "")" class="form-control rounded-start bg-dark text-light border-secondary" placeholder="Enter product name..." />
+                <button type="submit" class="btn btn-primary rounded-end">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Category Filter Dropdown -->
+        <div class="d-flex align-items-center gap-2">
+            <label for="category" class="fw-semibold mb-0 px-3 py-1 rounded"
+                   style="color: #ffffff; background: linear-gradient(135deg, #0d6efd, #000000); border: 1px solid #0d6efd;">
+                Filter by Category:
+            </label>
+            <!-- Dropdown changes automatically submit the form -->
+            <select id="category" name="category" class="form-select rounded bg-dark text-light border-secondary" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                <!-- Selected attribute set dynamically based on current filter -->
+                <option value="Games" selected="@(ViewBag.SelectedCategory == "Games")">Games</option>
+                <option value="Toys" selected="@(ViewBag.SelectedCategory == "Toys")">Toys</option>
+                <option value="Books" selected="@(ViewBag.SelectedCategory == "Books")">Books</option>
+            </select>
+        </div>
+    </form>
+
+    <!-- Products Grid -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="productGrid">
+        @foreach (var item in Model) // Loop through each product in the model
+        {
+            <div class="col">
+                <div class="card h-100 shadow-lg border-0 rounded-5 overflow-hidden position-relative bg-dark text-light">
+
+                    <!-- Ribbon badges for new or on-sale items -->
+                    @if (item.IsNew)
+                    {
+                        <div class="ribbon ribbon-top-left bg-success shadow-sm">
+                            <small class="fw-bold text-white px-2">NEW</small>
+                        </div>
+                    }
+                    @if (item.IsOnSale)
+                    {
+                        <div class="ribbon ribbon-top-right bg-danger shadow-sm">
+                            <small class="fw-bold text-white px-2">SALE</small>
+                        </div>
+                    }
+
+                    <!-- Product Image -->
+                    <div class="ratio ratio-1x1 bg-secondary border-bottom border-2 border-primary rounded-top-5 overflow-hidden">
+                        <img src="@Url.Content(item.ImageUrl ?? "~/images/placeholder.png")"
+                             onerror="this.onerror=null;this.src='@Url.Content("~/images/placeholder.png")';"
+                             alt="@item.Title"
+                             class="card-img-top rounded-top-5"
+                             style="object-fit: cover; width: 100%; height: 100%; transition: transform 0.4s ease;">
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="card-body d-flex flex-column p-4">
+                        <!-- Product title with truncation for long names -->
+                        <h5 class="card-title text-truncate" title="@item.Title" style="font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.25rem; color:#e9eef7;">
+                            @item.Title
+                        </h5>
+
+                        <!-- Category badge and rating stars -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <span class="badge bg-info text-dark fs-6 text-uppercase fw-semibold rounded-pill px-3 py-2">
+                                @item.Category
+                            </span>
+                            <div class="rating-stars" aria-label="Rating: @item.AverageRating out of 5">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    // Fill stars based on AverageRating
+                                    if (i <= Math.Floor(item.AverageRating))
+                                    {
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    }
+                                    else if (i - item.AverageRating < 1)
+                                    {
+                                        <i class="bi bi-star-half text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star text-warning"></i>
+                                    }
+                                }
+                                <small class="text-muted ms-2">(@item.ReviewCount)</small>
+                            </div>
+                        </div>
+
+                        <!-- Product short description -->
+                        <p class="card-text flex-grow-1 text-secondary" style="font-size: 0.9rem; line-height: 1.3em;">
+                            @item.ShortDescription
+                        </p>
+
+                        <!-- Price, stock, and Add to Cart button -->
+                        <div class="d-flex justify-content-between align-items-center mt-3 gap-3 flex-wrap">
+                            <div class="d-flex align-items-baseline gap-3 flex-grow-1">
+                                @if (item.IsOnSale) // Show original price and sale price
+                                {
+                                    <span class="text-decoration-line-through" style="font-size: 1.1rem; color: white;">
+                                        @item.OriginalPrice.ToString("C")
+                                    </span>
+                                    <span class="fs-5 fw-bold text-danger">
+                                        @item.Price.ToString("C")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="fs-5 fw-bold text-primary">
+                                        @item.Price.ToString("C")
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Stock status and Add to Cart -->
+                            <div class="d-flex align-items-center gap-4">
+                                @if (item.Quantity > 0)
+                                {
+                                    <small class="text-success fw-semibold d-flex align-items-center gap-1">
+                                        <i class="bi bi-check-circle-fill"></i> In Stock (@item.Quantity)
+                                    </small>
+                                    <a asp-action="AddToCart" asp-route-id="@item.Id" class="btn btn-sm btn-primary fw-semibold shadow-sm d-flex align-items-center gap-2" aria-label="Add @item.Title to cart">
+                                        Add to Cart <i class="bi bi-cart-plus"></i>
+                                    </a>
+                                }
+                                else // Disable button if out of stock
+                                {
+                                    <small class="text-danger fw-semibold d-flex align-items-center gap-1">
+                                        <i class="bi bi-x-circle-fill"></i> Out of Stock
+                                    </small>
+                                    <button class="btn btn-sm btn-secondary" disabled aria-label="@item.Title out of stock">
+                                        Add to Cart
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+    :root {
+        --bg-image-url: url('https://i0.wp.com/www.boardgamemeeplelady.com/wp-content/uploads/2020/03/tyson-wells-game-store-scaled.jpg?fit=2560%2C1440&ssl=1');
+    }
+
+    body {
+        background-image: var(--bg-image-url); /* Sets full-page background */
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+        background-size: cover;
+        color: #e9eef7;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header-box {
+        background: rgba(10, 15, 40, 0.7); /* Semi-transparent for glass effect */
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(13, 110, 253, 0.6);
+        box-shadow: 0 0 20px rgba(13, 110, 253, 0.4);
+    }
+
+    /* Ribbons for new/sale products */
+    .ribbon {
+        width: 70px;
+        height: 24px;
+        line-height: 22px;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-align: center;
+        position: absolute;
+        z-index: 11;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .ribbon-top-left {
+        top: 0;
+        left: 0;
+    }
+
+    .ribbon-top-right {
+        top: 0;
+        right: 0;
+        border-radius: 0 0 0 8px;
+    }
+
+    /* Hover animation for product images */
+    .card-img-top:hover {
+        transform: scale(1.1);
+        transition: transform 0.5s ease;
+    }
+
+    .rating-stars i {
+        font-size: 1rem;
+    }
+
+    .btn-primary {
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        background-color: #6610f2;
+        color: #e9eef7;
+    }
+
+        .btn-primary:hover {
+            background-color: #5200b7;
+            box-shadow: 0 0 15px rgba(82, 0, 183, 0.6);
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: #e9eef7;
+    }
+
+    .card {
+        transition: box-shadow 0.4s ease, transform 0.4s ease;
+        cursor: pointer;
+        background-color: rgba(19, 23, 34, 0.95);
+        color: #e9eef7;
+    }
+
+        .card:hover {
+            box-shadow: 0 1rem 2rem rgba(102, 16, 242, 0.4);
+            transform: translateY(-10px);
+            z-index: 10;
+        }
+
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .text-gradient-secondary {
+        background: linear-gradient(90deg, #6610f2, #0d6efd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+</style>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+}

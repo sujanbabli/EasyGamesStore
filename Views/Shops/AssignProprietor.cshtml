@@ -1,0 +1,149 @@
+﻿@{
+    // Sets the browser tab title for the page
+    ViewData["Title"] = "Assign Proprietor to Shop";
+}
+
+<!-- ===============================
+     PAGE CONTAINER
+     =============================== -->
+<div class="assign-proprietor-page py-5" style="min-height:100vh; background-color:#f9fafb;">
+
+    <!-- The central content box: styled as a clean white card -->
+    <div class="container bg-white text-dark p-4 rounded-4 shadow-sm border" style="max-width:650px;">
+        <!-- Page heading -->
+        <h2 class="fw-bold mb-4" style="color:#0d1b2a;">🏷️ Assign Proprietor to Shop</h2>
+
+        <!-- ===============================
+             FORM SECTION
+             =============================== -->
+        <!-- This form submits to the AssignProprietor POST action in the controller -->
+        <form asp-action="AssignProprietor" method="post">
+
+            <!-- Validation summary displays model state errors (if any) -->
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <!-- ===============================
+                 SHOP SELECTION DROPDOWN
+                 =============================== -->
+            <div class="mb-3">
+                <label for="shopId" class="form-label fw-semibold">Select Shop</label>
+                <!--
+                    Dropdown dynamically populated using ViewBag.Shops.
+                    Each option shows the shop’s name and address.
+                    The selected shop determines where the proprietor will be assigned.
+                -->
+                <select id="shopId" name="shopId" class="form-select border-secondary bg-white text-dark" required>
+                    <option value="">Select a Shop</option>
+                    @foreach (var shop in ViewBag.Shops)
+                    {
+                        <option value="@shop.Id">@shop.Name (@shop.Address)</option>
+                    }
+                </select>
+            </div>
+
+            <!-- ===============================
+                 PROPRIETOR EMAIL INPUT
+                 =============================== -->
+            <div class="mb-3">
+                <label for="proprietorEmail" class="form-label fw-semibold">Proprietor Email</label>
+                <!-- The email identifies the proprietor account to be linked to the shop -->
+                <input type="email" id="proprietorEmail" name="proprietorEmail" class="form-control border-secondary" placeholder="example@email.com" required />
+            </div>
+
+            <!-- ===============================
+                 PROPRIETOR PASSWORD INPUT
+                 =============================== -->
+            <div class="mb-4">
+                <label for="proprietorPassword" class="form-label fw-semibold">Proprietor Password</label>
+                <!-- Password field for account creation or verification -->
+                <input type="password" id="proprietorPassword" name="proprietorPassword" class="form-control border-secondary" placeholder="Enter password" required />
+            </div>
+
+            <!-- ===============================
+                 ACTION BUTTONS
+                 =============================== -->
+            <div class="d-flex align-items-center">
+                <!-- Main submit button to assign proprietor -->
+                <button type="submit" class="btn btn-primary me-2 px-4">✅ Assign</button>
+
+                <!-- Navigation button to go back to shop list -->
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to Shops</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ===============================
+     CUSTOM WHITE THEME STYLES
+     =============================== -->
+<style>
+    /*
+           The base body style defines a clean, light theme
+           suitable for administrative or setup pages.
+        */
+    body {
+        background-color: #f9fafb;
+        color: #212529;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow-x: hidden; /* Prevents unwanted horizontal scroll */
+    }
+
+    /* Heading styling for consistency and visual hierarchy */
+    h2 {
+        font-weight: 700;
+        color: #0d1b2a;
+    }
+
+    /* Primary button: blue, rounded, and with hover animation */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
+        }
+
+    /* Secondary outline button: clean and neutral look */
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Form field appearance for modern look and feel */
+    .form-control, .form-select {
+        border-radius: 8px;
+        background-color: #ffffff;
+        color: #212529;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        /* Highlights field when focused */
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 6px rgba(13, 110, 253, 0.25);
+        }
+
+    /* Subtle border around main container for structure */
+    .container {
+        border: 1px solid #dee2e6;
+    }
+
+    /* Alert style (used if server validation messages are added later) */
+    .alert {
+        border-radius: 8px;
+        background-color: #cfe2ff;
+        color: #084298;
+        border: 1px solid #b6d4fe;
+    }
+</style>

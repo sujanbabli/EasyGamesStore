@@ -1,0 +1,165 @@
+﻿@model EasyGamesStore.Models.Order
+
+<!-- Main container for the order confirmation page -->
+<div class="order-page" style="min-height: 100vh; background-color: #0b0d12; padding: 3rem 1rem;">
+    <div class="container bg-dark bg-opacity-75 text-light p-4 rounded-4 shadow-lg">
+
+        <!-- Page header / Thank you message -->
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-gradient-primary">Thank You for Your Purchase!</h2>
+            <p class="lead text-light">Your order has been successfully placed.</p>
+        </div>
+
+        <div class="row mb-5">
+
+            <!-- Order Information -->
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm border-0 rounded-4 p-4 h-100">
+                    <h4 class="fw-bold text-gradient-primary">Order Details</h4>
+                    <hr />
+                    <!-- Display unique order ID -->
+                    <p><strong>Order ID:</strong> @Model.Id</p>
+                    <!-- Show the order creation date converted to local time -->
+                    <p><strong>Order Date:</strong> @Model.CreatedAt.ToLocalTime()</p>
+                    <!-- Display order status badge (hardcoded as "Confirmed" for simplicity) -->
+                    <p><strong>Status:</strong> <span class="badge bg-success">Confirmed</span></p>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm border-0 rounded-4 p-4 h-100">
+                    <h4 class="fw-bold text-gradient-primary">Customer Info</h4>
+                    <hr />
+                    <!-- Show the user ID associated with this order -->
+                    <p><strong>User ID:</strong> @Model.UserId</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table for all items in the order -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4 p-4">
+            <h4 class="fw-bold mb-3 text-gradient-primary">Order Summary</h4>
+
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Title</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-end">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        // Initialize a subtotal variable to calculate total cost
+                        decimal subtotal = 0;
+                    }
+
+                    @foreach (var item in Model.Items) // Loop through each item in the order
+                    {
+                        // Calculate subtotal for each item
+                        var itemSubtotal = item.UnitPrice * item.Quantity;
+                        subtotal += itemSubtotal; // Add to running subtotal
+
+                        <tr>
+                            <!-- Product title; uses null-safe operator if StockItem is missing -->
+                            <td>@item.StockItem?.Title</td>
+                            <!-- Display unit price formatted as currency -->
+                            <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                            <!-- Show quantity ordered -->
+                            <td class="text-center">@item.Quantity</td>
+                            <!-- Show subtotal for this row -->
+                            <td class="text-end">@itemSubtotal.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Billing summary with tax calculation -->
+        <div class="row justify-content-end mb-5">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 rounded-4 p-4">
+                    <h5 class="fw-bold mb-3 text-gradient-primary">Billing Summary</h5>
+
+                    <!-- Show subtotal -->
+                    <div class="d-flex justify-content-between">
+                        <span>Subtotal:</span>
+                        <span>@subtotal.ToString("C")</span>
+                    </div>
+
+                    @{
+                        // Example tax calculation
+                        var taxRate = 0.10m; // 10% tax
+                        var tax = subtotal * taxRate; // Calculate tax amount
+                        var total = subtotal + tax;   // Total including tax
+                    }
+
+                    <!-- Show tax amount -->
+                    <div class="d-flex justify-content-between">
+                        <span>Tax (10%):</span>
+                        <span>@tax.ToString("C")</span>
+                    </div>
+
+                    <hr />
+
+                    <!-- Show grand total -->
+                    <div class="d-flex justify-content-between fw-bold fs-5">
+                        <span>Total:</span>
+                        <span>@total.ToString("C")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call-to-action / Continue shopping -->
+        <div class="text-center">
+            <p class="lead mb-3">We appreciate your business! A confirmation email has been sent to your registered email address.</p>
+            <a asp-action="Index" class="btn btn-primary btn-lg">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+
+<!-- Page-specific styles -->
+<style>
+    /* Gradient text for headings */
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #0d6efd, #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Card styling with semi-transparent dark background */
+    .card {
+        background-color: rgba(19, 23, 34, 0.95);
+        color: #e9eef7;
+    }
+
+    /* Hover effect for table rows */
+    .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Page body background and text color */
+    body, html {
+        background-color: #0b0d12;
+        color: #e9eef7;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Badge color for confirmed status */
+    .badge.bg-success {
+        background-color: #198754;
+    }
+
+    /* Primary button styling */
+    .btn-primary {
+        background-color: #6610f2;
+        color: #fff;
+    }
+
+        .btn-primary:hover {
+            background-color: #5200b7;
+        }
+</style>

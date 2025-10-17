@@ -1,0 +1,68 @@
+﻿@model EasyGamesStore.Models.Shop
+
+@{
+    // Sets the page title shown in the browser tab and layout header
+    ViewData["Title"] = "Shop Details";
+}
+
+<!-- ===============================
+     PAGE HEADING
+     =============================== -->
+<h2>Shop Details</h2>
+
+<!-- ===============================
+     SHOP DETAILS CARD
+     =============================== -->
+<!--
+     Displays key information for the selected shop inside a Bootstrap-styled card.
+     This provides a clean, organized view of all relevant shop fields.
+-->
+<div class="card p-4 mt-3 shadow">
+    <!-- Shop name -->
+    <h4>@Model.Name</h4>
+
+    <!-- Basic shop information -->
+    <p><strong>Address:</strong> @Model.Address</p>
+    <p><strong>Phone:</strong> @Model.Phone</p>
+    <p><strong>Proprietor Email:</strong> @Model.ProprietorEmail</p>
+
+    <!-- ===============================
+         CONDITIONAL PASSWORD DISPLAY
+         =============================== -->
+    <!--
+         Only Admins or Owners are allowed to view the proprietor password.
+         The password itself is shown in monospace for clarity and styled in red to indicate sensitivity.
+         If the password is null or empty, a placeholder message is shown instead.
+    -->
+    @if (User.IsInRole("Owner") || User.IsInRole("Admin"))
+    {
+        if (!string.IsNullOrEmpty(Model.ProprietorPassword))
+        {
+            <p>
+                <strong>Proprietor Password:</strong>
+                <span style="font-family: monospace; color: #c82333;">
+                    @Model.ProprietorPassword
+                </span>
+            </p>
+        }
+        else
+        {
+            <p>
+                <strong>Proprietor Password:</strong>
+                <span class="text-muted">(Not available)</span>
+            </p>
+        }
+    }
+</div>
+
+<!-- ===============================
+     ACTION BUTTONS
+     =============================== -->
+<!--
+     Provides navigation for editing this record or returning to the shop list.
+     The Edit button links to the Edit view, passing the shop’s Id as a route parameter.
+-->
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

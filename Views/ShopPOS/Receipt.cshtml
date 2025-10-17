@@ -1,0 +1,163 @@
+﻿@model EasyGamesStore.Models.ShopOrder
+
+@{
+    // Sets the browser title dynamically to show a friendly post-purchase message.
+    ViewData["Title"] = "Thank You for Your Purchase!";
+}
+
+<!-- ===============================
+     MAIN CONTAINER
+     =============================== -->
+<div class="container py-5">
+    <!-- The receipt card visually groups all receipt information in a soft card layout -->
+    <div class="card shadow-lg p-4 border-0 rounded-4" style="background: #f9fafc;">
+
+        <!-- ===============================
+             HEADER: CONFIRMATION MESSAGE
+             =============================== -->
+        <div class="text-center mb-4">
+            <!-- Main thank-you heading shown after a successful checkout -->
+            <h1 class="fw-bold text-success">✅ Thank You for Shopping with EasyGamesStore!</h1>
+            <p class="text-muted fs-5">Your order has been successfully placed.</p>
+        </div>
+
+        <!-- ===============================
+             SHOP DETAILS SECTION
+             =============================== -->
+        <div class="text-center mb-4">
+            <!-- Displays the name and address of the shop fulfilling this order -->
+            <h4 class="fw-bold mb-1">@Model.Shop?.Name</h4>
+            <p class="mb-0">@Model.Shop?.Address</p>
+
+            <!-- Shows localized date and time of purchase -->
+            <small class="text-muted">
+                Date: @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+            </small>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- ===============================
+             CUSTOMER INFORMATION
+             =============================== -->
+        <div class="mb-4">
+            <h5 class="fw-bold text-primary mb-3">
+                <i class="bi bi-person-circle me-2"></i>Customer Details
+            </h5>
+
+            <!-- Shows the customer's email if provided; otherwise prints fallback text -->
+            <p>
+                <strong>Email:</strong>
+                @(string.IsNullOrWhiteSpace(ViewBag.CustomerEmail) ? "Not provided" : ViewBag.CustomerEmail)
+            </p>
+
+            <!-- Displays the customer's phone number or dash if empty -->
+            <p>
+                <strong>Phone:</strong>
+                @(string.IsNullOrWhiteSpace(Model.CustomerPhone) ? "—" : Model.CustomerPhone)
+            </p>
+        </div>
+
+        <!-- ===============================
+             ORDER DETAILS TABLE
+             =============================== -->
+        <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Item</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-end">Price</th>
+                        <th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Loops through each order item and renders details -->
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <!-- Product title and category -->
+                                <strong>@item.StockItem?.Title</strong><br />
+                                <small class="text-muted">@item.StockItem?.Category</small>
+                            </td>
+
+                            <!-- Quantity purchased -->
+                            <td class="text-center">@item.Quantity</td>
+
+                            <!-- Unit price for one item -->
+                            <td class="text-end">$@item.UnitPrice.ToString("0.00")</td>
+
+                            <!-- Line total = unit price * quantity -->
+                            <td class="text-end">$@((item.UnitPrice * item.Quantity).ToString("0.00"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===============================
+             PAYMENT SUMMARY CARD
+             =============================== -->
+        <div class="row mb-4 justify-content-end">
+            <div class="col-md-5">
+                <!-- Displays subtotal, tax, and total neatly in a small summary card -->
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Order Summary</h6>
+
+                        <!-- Subtotal before tax -->
+                        <div class="d-flex justify-content-between">
+                            <span>Subtotal:</span>
+                            <span>$@Model.Total.ToString("0.00")</span>
+                        </div>
+
+                        <!-- Estimated tax at 10% -->
+                        <div class="d-flex justify-content-between">
+                            <span>Tax (10%):</span>
+                            <span>$@((Model.Total * 0.10m).ToString("0.00"))</span>
+                        </div>
+
+                        <!-- Final total including tax -->
+                        <div class="d-flex justify-content-between border-top mt-2 pt-2 fw-bold fs-5">
+                            <span>Total:</span>
+                            <span>$@((Model.Total * 1.10m).ToString("0.00"))</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===============================
+             POST-PURCHASE MESSAGE
+             =============================== -->
+        <div class="text-center my-4">
+            <p class="text-muted mb-1">
+                Your receipt has been saved. You can print it anytime for your records.
+            </p>
+            <p class="fw-semibold">
+                We hope you enjoy your purchase! 🎮
+            </p>
+        </div>
+
+        <!-- ===============================
+             ACTION BUTTONS
+             =============================== -->
+        <div class="text-center">
+            <!-- Start a new sale to continue using POS -->
+            <a asp-action="Index" class="btn btn-success me-2">
+                <i class="bi bi-cart-plus me-1"></i>New Sale
+            </a>
+
+            <!-- Navigate back to shop dashboard -->
+            <a asp-controller="ShopDashboard" asp-action="Index" class="btn btn-secondary me-2">
+                <i class="bi bi-shop me-1"></i>Back to Dashboard
+            </a>
+
+            <!-- Print the receipt using the browser's print dialog -->
+            <button class="btn btn-outline-dark" onclick="window.print()">
+                <i class="bi bi-printer me-1"></i>Print Receipt
+            </button>
+        </div>
+    </div>
+</div>

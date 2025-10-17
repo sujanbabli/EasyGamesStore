@@ -1,0 +1,226 @@
+﻿@model IEnumerable<EasyGamesStore.Models.UserRolesViewModel>
+
+@{
+    ViewData["Title"] = "User Management Dashboard";
+    int totalUsers = Model.Count();
+    int adminCount = Model.Count(u => u.Roles.Contains("Admin"));
+    int proprietorCount = Model.Count(u => u.Roles.Contains("Proprietor"));
+    int ownerCount = Model.Count(u => u.Roles.Contains("Owner"));
+}
+
+<!-- ========== HEADER ========== -->
+<div class="header-bar">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold text-white mb-1">👥 User Management Dashboard</h2>
+            <p class="text-light mb-0">Manage users, roles, and admin access easily.</p>
+        </div>
+        <span class="badge bg-light text-dark">Updated: @DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="container fade-in my-5">
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success mb-4 shadow-sm">@TempData["Message"]</div>
+    }
+
+    <!-- Summary Cards -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="summary-card border-primary">
+                <div class="summary-icon text-primary"><i class="bi bi-people-fill"></i></div>
+                <h6 class="text-muted mb-1">Total Users</h6>
+                <h4 class="fw-bold text-primary">@totalUsers</h4>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="summary-card border-success">
+                <div class="summary-icon text-success"><i class="bi bi-person-gear"></i></div>
+                <h6 class="text-muted mb-1">Admins</h6>
+                <h4 class="fw-bold text-success">@adminCount</h4>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="summary-card border-warning">
+                <div class="summary-icon text-warning"><i class="bi bi-briefcase-fill"></i></div>
+                <h6 class="text-muted mb-1">Proprietors</h6>
+                <h4 class="fw-bold text-warning">@proprietorCount</h4>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="summary-card border-info">
+                <div class="summary-icon text-info"><i class="bi bi-shop"></i></div>
+                <h6 class="text-muted mb-1">Owners</h6>
+                <h4 class="fw-bold text-info">@ownerCount</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <div>
+            <a asp-action="Create" class="btn btn-primary shadow-sm me-2">➕ Create New User</a>
+            <a asp-controller="AdminMessages" asp-action="Index" class="btn btn-info shadow-sm">📧 Message Users</a>
+        </div>
+        <span class="text-muted small">Tip: Use filters or roles to manage users effectively.</span>
+    </div>
+
+    <!-- User Table -->
+    <div class="table-responsive rounded-3 shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Email</th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@user.Email</td>
+                        <td>
+                            @foreach (var role in user.Roles)
+                            {
+                                var color = role switch
+                                {
+                                    "Admin" => "bg-danger",
+                                    "Proprietor" => "bg-warning text-dark",
+                                    "Owner" => "bg-success",
+                                    "User" => "bg-secondary",
+                                    _ => "bg-info"
+                                };
+                                <span class="badge @color me-1">@role</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <form asp-action="Delete" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@user.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- ========== STYLES ========== -->
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header Bar */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Summary Cards */
+    .summary-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 15px;
+        transition: all 0.2s ease;
+    }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+    .summary-icon {
+        font-size: 1.8rem;
+        margin-bottom: 6px;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
+        }
+
+    .btn-info {
+        background-color: #0dcaf0;
+        border: none;
+        color: #fff;
+    }
+
+        .btn-info:hover {
+            background-color: #0bbbe3;
+            box-shadow: 0 0 10px rgba(13, 202, 240, 0.4);
+        }
+
+    /* Table */
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+        .table th {
+            background-color: #0d6efd;
+            color: #fff;
+            font-weight: 600;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #eef5ff;
+        transition: 0.2s;
+    }
+
+    /* Alerts */
+    .alert {
+        border-radius: 8px;
+        color: #000;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        border: 1px solid #badbcc;
+    }
+
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

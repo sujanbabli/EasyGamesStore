@@ -1,0 +1,419 @@
+﻿@model List<EasyGamesStore.Models.ShopStock>
+
+@{
+    // Retrieve the shop object passed from the controller (via ViewBag)
+    // This helps personalize the POS interface for each shop instance.
+    var shop = ViewBag.Shop;
+
+    // Set the page title dynamically to include the current shop’s name
+    ViewData["Title"] = "EPOS - " + shop.Name;
+}
+
+<!-- Import Bootstrap and jQuery for responsive design and interactivity -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<style>
+    /* ===============================
+           GENERAL PAGE STYLING
+           =============================== */
+    body {
+        background: #f2f4f8; /* Light gray background for soft contrast */
+        font-family: "Segoe UI", Roboto, sans-serif; /* Clean, modern typeface */
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; /* Prevents horizontal scrollbars */
+    }
+
+    /* ===============================
+           HEADER BAR
+           =============================== */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997); /* Blue-green gradient */
+        color: #fff;
+        padding: 18px 25px;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Subtle shadow under header */
+        position: sticky;
+        top: 0; /* Keeps header fixed while scrolling */
+        z-index: 999; /* Ensures header stays above other elements */
+    }
+
+        .header-bar h2 {
+            font-weight: 700; /* Bold title for visual emphasis */
+        }
+
+    /* ===============================
+           MAIN LAYOUT WRAPPER
+           =============================== */
+    .epos-wrapper {
+        display: flex;
+        flex-wrap: wrap; /* Allows wrapping for smaller screens */
+        gap: 25px;
+        justify-content: space-between;
+        padding-bottom: 120px; /* Adds space for fixed footer */
+    }
+
+    /* ===============================
+           LEFT SECTION: PRODUCT PANEL
+           =============================== */
+    .product-panel {
+        flex: 3;
+        min-width: 600px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e1e1e1;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* ===============================
+           RIGHT SECTION: ORDER SUMMARY PANEL
+           =============================== */
+    .summary-panel {
+        flex: 1;
+        min-width: 300px;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e1e1e1;
+        position: sticky; /* Keeps the panel visible while scrolling */
+        top: 100px;
+        height: fit-content;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* ===============================
+           PRODUCT CARD STYLING
+           =============================== */
+    .product-card {
+        width: 180px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 8px;
+        text-align: center;
+        background: #fff;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+    }
+
+        /* Add hover feedback for better user experience */
+        .product-card:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+    /* Consistent image sizing within each product card */
+    .product-img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    /* Fix z-index stacking for +/- buttons in input groups */
+    .input-group-sm button {
+        z-index: 3;
+    }
+
+    /* ===============================
+           CUSTOMER INFORMATION CARD
+           =============================== */
+    .customer-info-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e1e1e1;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* ===============================
+           FOOTER
+           =============================== */
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: white;
+        padding: 10px 15px;
+        text-align: center;
+        font-size: 0.9rem;
+        z-index: 1000;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ===============================
+           RESPONSIVENESS
+           =============================== */
+    @@media (max-width: 992px) {
+        .epos-wrapper {
+            flex-direction: column;
+            padding-bottom: 180px; /* Additional space for footer */
+        }
+
+        .product-panel,
+        .summary-panel {
+            min-width: 100%; /* Full width on smaller screens */
+        }
+    }
+
+    /* ===============================
+           ANIMATIONS
+           =============================== */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- ===============================
+     HEADER SECTION
+     =============================== -->
+<div class="header-bar">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="mb-0">EasyGamesStore POS</h2>
+            <!-- Displays shop name dynamically -->
+            <small>Shop: <strong>@shop.Name</strong></small>
+        </div>
+        <div>
+            <!-- Current date display -->
+            <span class="badge bg-light text-dark">Date: @DateTime.Now.ToString("dd MMM yyyy")</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===============================
+     MAIN BODY CONTENT
+     =============================== -->
+<div class="container mt-4 mb-5 fade-in">
+    <!-- The form will post sale data back to ProcessSale action -->
+    <form asp-action="ProcessSale" method="post">
+
+        <!-- CUSTOMER INFORMATION SECTION -->
+        <div class="customer-info-card mb-4">
+            <h5 class="fw-bold text-primary"><i class="bi bi-person-circle me-2"></i>Customer Information</h5>
+            <div class="row g-3">
+                <!-- Customer email input -->
+                <div class="col-md-4">
+                    <label class="form-label">Email:</label>
+                    <input type="email" id="customerEmail" name="customerEmail" class="form-control" placeholder="example@email.com" />
+                </div>
+
+                <!-- Customer phone input -->
+                <div class="col-md-4">
+                    <label class="form-label">Phone:</label>
+                    <input type="text" id="customerPhone" name="customerPhone" class="form-control" placeholder="04XXXXXXXX" />
+                </div>
+
+                <!-- Checkbox to auto-signup new customer -->
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="signupNew" value="true" id="signupNew" />
+                        <label class="form-check-label" for="signupNew">New customer? Auto-sign up</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer tier info dynamically updated via AJAX -->
+            <div class="mt-2" id="tierDisplay">
+                <span class="badge bg-secondary">Tier: Guest (0% Discount)</span>
+            </div>
+        </div>
+
+        <!-- ===============================
+             EPOS WRAPPER: PRODUCTS + SUMMARY
+             =============================== -->
+        <div class="epos-wrapper">
+
+            <!-- LEFT PANEL: PRODUCTS LIST -->
+            <div class="product-panel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0 text-dark">🕹️ Products</h5>
+                    <!-- Product search box -->
+                    <input type="text" id="searchBox" class="form-control w-50" placeholder="🔍 Search product..." />
+                </div>
+
+                <!-- Product grid dynamically rendered using the model -->
+                <div class="d-flex flex-wrap justify-content-start" id="productGrid">
+                    @foreach (var item in Model)
+                    {
+                        // Determine actual product price
+                        // If there's a price override, use it; otherwise, use stock price
+                        var price = item.PriceOverride ?? item.StockItem?.Price ?? 0;
+
+                        <div class="product-card fade-in" data-title="@item.StockItem?.Title.ToLower()">
+                            <img src="@item.StockItem?.ImageUrl" class="product-img" alt="@item.StockItem?.Title" />
+                            <h6 class="fw-semibold">@item.StockItem?.Title</h6>
+                            <p class="text-muted small mb-1">@item.StockItem?.Category</p>
+                            <p class="fw-bold text-success mb-2">$@price.ToString("0.00")</p>
+
+                            <!-- Quantity control buttons -->
+                            <div class="input-group input-group-sm justify-content-center">
+                                <button type="button" class="btn btn-outline-secondary" onclick="changeQty(@item.StockItemId, -1)">−</button>
+                                <input type="number" name="quantities[@item.StockItemId]" id="qty_@item.StockItemId" class="form-control text-center" value="0" min="0" readonly />
+                                <button type="button" class="btn btn-outline-primary" onclick="changeQty(@item.StockItemId, 1)">+</button>
+                            </div>
+
+                            <!-- Low stock indicator -->
+                            @if (item.Quantity <= 2)
+                            {
+                                <span class="badge bg-danger mt-2">Low Stock: @item.Quantity</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: ORDER SUMMARY -->
+            <div class="summary-panel">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-receipt me-2"></i>Order Summary</h5>
+
+                <!-- Live list of selected items -->
+                <div id="summaryList" style="max-height: 320px; overflow-y:auto;">
+                    <p class="text-muted">No items selected.</p>
+                </div>
+
+                <hr />
+
+                <!-- Subtotal and discount details -->
+                <div class="d-flex justify-content-between mb-1">
+                    <strong>Subtotal:</strong><span id="subtotal">$0.00</span>
+                </div>
+                <div class="d-flex justify-content-between text-success mb-1">
+                    <strong>Discount:</strong><span id="discount">0%</span>
+                </div>
+
+                <!-- Final total after discount -->
+                <div class="d-flex justify-content-between fs-5 border-top pt-2">
+                    <strong>Total:</strong><span id="total">$0.00</span>
+                </div>
+
+                <!-- Complete sale button -->
+                <button type="submit" class="btn btn-success w-100 mt-4 shadow-sm">
+                    <i class="bi bi-cash-stack me-1"></i>Complete Sale
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- ===============================
+     FIXED FOOTER
+     =============================== -->
+<footer>
+    © @DateTime.Now.Year EasyGamesStore | Thank you for using our POS System 💳
+</footer>
+
+<!-- ===============================
+     JAVASCRIPT LOGIC
+     =============================== -->
+<script>
+    // Variable to store customer discount percentage
+    let currentDiscount = 0;
+
+    // -------------------------------
+    // PRODUCT SEARCH FILTER
+    // -------------------------------
+    $("#searchBox").on("input", function () {
+        const term = $(this).val().toLowerCase(); // Convert input to lowercase for matching
+        $(".product-card").each(function () {
+            // Toggle visibility based on product title match
+            $(this).toggle($(this).data("title").includes(term));
+        });
+    });
+
+    // -------------------------------
+    // QUANTITY INCREMENT/DECREMENT
+    // -------------------------------
+    function changeQty(id, delta) {
+        const input = $("#qty_" + id);
+        let val = parseInt(input.val() || "0");
+        val = Math.max(0, val + delta); // Prevent negative quantities
+        input.val(val);
+        updateSummary(); // Refresh the summary panel each time
+    }
+
+    // -------------------------------
+    // ORDER SUMMARY CALCULATION
+    // -------------------------------
+    function updateSummary() {
+        const summary = $("#summaryList");
+        summary.empty(); // Clear current list
+        let subtotal = 0;
+
+        // Iterate through all product quantity fields
+        $("[id^='qty_']").each(function () {
+            const qty = parseInt($(this).val());
+            if (qty > 0) {
+                const card = $(this).closest(".product-card");
+                const title = card.find("h6").text();
+                const price = parseFloat(card.find("p.fw-bold").text().replace("$", ""));
+                const lineTotal = qty * price;
+                subtotal += lineTotal;
+
+                // Add line item to summary panel
+                summary.append(`<div class='d-flex justify-content-between'>
+                    <span>${title} × ${qty}</span><span>$${lineTotal.toFixed(2)}</span>
+                </div>`);
+            }
+        });
+
+        // If no products selected, show placeholder text
+        if (subtotal === 0)
+            summary.html("<p class='text-muted'>No items selected.</p>");
+
+        // Calculate discount and total
+        const discountAmount = (currentDiscount / 100) * subtotal;
+        const total = subtotal - discountAmount;
+
+        // Update display fields
+        $("#subtotal").text(`$${subtotal.toFixed(2)}`);
+        $("#discount").text(`${currentDiscount}%`);
+        $("#total").text(`$${total.toFixed(2)}`);
+    }
+
+    // -------------------------------
+    // LIVE CUSTOMER TIER LOOKUP
+    // -------------------------------
+    $("#customerEmail, #customerPhone").on("input", function () {
+        const val = $(this).val().trim();
+        if (val.length < 3) return; // Avoid triggering too early
+
+        // Call backend endpoint to retrieve customer tier and discount
+        $.get("/ShopPOS/GetCustomerTier", { emailOrPhone: val }, function (res) {
+            if (res.found) {
+                // Display tier badge and apply discount
+                $("#tierDisplay").html(
+                    `<span class="badge bg-info text-dark">Tier: ${res.tier} (${res.discount}% Discount)</span>`
+                );
+                currentDiscount = res.discount;
+            } else {
+                // Default guest display if not found
+                $("#tierDisplay").html(
+                    `<span class="badge bg-secondary">Tier: Guest (0% Discount)</span>`
+                );
+                currentDiscount = 0;
+            }
+
+            // Update totals with new discount value
+            updateSummary();
+        });
+    });
+</script>

@@ -1,0 +1,319 @@
+﻿@{
+    var shop = ViewBag.Shop;
+    int totalItems = ViewBag.TotalItems;
+    var shopStock = ViewBag.ShopStock as List<EasyGamesStore.Models.ShopStock>;
+    ViewData["Title"] = "My Shop Dashboard";
+}
+
+<!--
+    ================================
+    MY SHOP DASHBOARD (PROPRIETOR VIEW)
+    ================================
+    Purpose:
+    This page provides the shop proprietor with an overview of their shop’s
+    essential information — including shop details, inventory list, and key
+    actions like viewing stock, adding items, or managing POS (Point of Sale) operations.
+
+    Features:
+    - Displays shop name, address, proprietor info, and contact.
+    - Lists current inventory with stock health indicators.
+    - Highlights low stock items visually.
+    - Provides actionable links for managing the shop efficiently.
+-->
+<!-- ================== PAGE STYLES ================== -->
+<style>
+    body {
+        background: #f4f6f9;
+        overflow-x: hidden;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header Section Styling */
+    .dashboard-header {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: white;
+        border-radius: 0 0 12px 12px;
+        padding: 25px 30px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 25px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+        .dashboard-header h2 {
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .dashboard-header p {
+            margin: 5px 0 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+    /* Content and Card Layout */
+    .content-wrapper {
+        padding: 20px 15px 160px;
+    }
+
+    .card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        border: 1px solid #e2e6ea;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        overflow: hidden;
+    }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    h4 {
+        font-weight: 700;
+        color: #0d1b2a;
+    }
+
+    /* Inventory Table Styling */
+    .table thead {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1f5fb;
+        transition: 0.2s;
+    }
+
+    /* Stock Status Badges */
+    .badge-status {
+        font-size: 0.85rem;
+        padding: 5px 8px;
+        border-radius: 5px;
+    }
+
+    .badge-low {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .badge-healthy {
+        background-color: #20c997;
+        color: white;
+    }
+
+    /* Action Buttons at Page Bottom */
+    .bottom-actions {
+        margin-top: 2.5rem;
+        margin-bottom: 5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+        .bottom-actions .btn {
+            flex: 1;
+            min-width: 180px;
+            font-weight: 600;
+            padding: 12px 18px;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .bottom-actions .btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            }
+
+    /* Mobile Layout */
+    @@media (max-width: 768px) {
+        .bottom-actions {
+            flex-direction: column;
+        }
+
+            .bottom-actions .btn {
+                width: 100%;
+            }
+    }
+
+    /* Dashboard Summary Cards */
+    .summary-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .summary-card {
+        flex: 1;
+        min-width: 200px;
+        padding: 15px;
+        background: #fff;
+        border-radius: 10px;
+        text-align: center;
+        border: 1px solid #e1e1e1;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: 0.3s;
+    }
+
+        .summary-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    .summary-icon {
+        font-size: 1.8rem;
+        margin-bottom: 6px;
+    }
+
+    /* Fade-in Animation for smooth loading */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Sticky Footer */
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        text-align: center;
+        padding: 12px 10px;
+        font-size: 0.9rem;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 999;
+    }
+</style>
+
+<!-- ================== HEADER ================== -->
+<div class="dashboard-header">
+    <h2>Welcome to @shop.Name Dashboard</h2>
+    <p>Manage your store’s inventory, sales, and updates in one place.</p>
+</div>
+
+<!-- ================== MAIN CONTENT ================== -->
+<div class="content-wrapper fade-in">
+
+    <!-- Error Message Display -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+    }
+
+    <!-- ========== SHOP SUMMARY CARDS ========== -->
+    <div class="summary-grid mb-4">
+        <!-- Shop Name -->
+        <div class="summary-card">
+            <div class="summary-icon text-primary"><i class="bi bi-shop"></i></div>
+            <h6 class="fw-bold text-secondary mb-1">Shop Name</h6>
+            <p class="fw-semibold text-dark">@shop.Name</p>
+        </div>
+
+        <!-- Total Items -->
+        <div class="summary-card">
+            <div class="summary-icon text-success"><i class="bi bi-box-seam"></i></div>
+            <h6 class="fw-bold text-secondary mb-1">Total Stock Items</h6>
+            <p class="fw-semibold text-dark">@totalItems</p>
+        </div>
+
+        <!-- Proprietor Email -->
+        <div class="summary-card">
+            <div class="summary-icon text-warning"><i class="bi bi-envelope"></i></div>
+            <h6 class="fw-bold text-secondary mb-1">Proprietor Email</h6>
+            <p class="fw-semibold text-dark">@shop.ProprietorEmail</p>
+        </div>
+    </div>
+
+    <!-- ========== SHOP INFORMATION ========== -->
+    <div class="card p-3 shadow-sm mb-4">
+        <h4 class="mb-3">🏪 Shop Information</h4>
+        <p><strong>Address:</strong> @shop.Address</p>
+        <p><strong>Phone:</strong> @shop.Phone</p>
+        <p><strong>Proprietor:</strong> @shop.ProprietorEmail</p>
+        <p><strong>Total Items in Stock:</strong> @totalItems</p>
+    </div>
+
+    <!-- ========== INVENTORY TABLE ========== -->
+    @if (shopStock != null && shopStock.Any())
+    {
+        <div class="card p-3 shadow-sm mb-4">
+            <h4 class="mb-3">📦 Current Inventory</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Price ($)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in shopStock)
+                        {
+                            var rowClass = item.Quantity <= 2 ? "table-warning" : "";
+                            var badgeClass = item.Quantity <= 2 ? "badge-low" : "badge-healthy";
+                            var badgeText = item.Quantity <= 2 ? "Low Stock" : "Healthy";
+
+                            <tr class="@rowClass">
+                                <td>@item.StockItem?.Title</td>
+                                <td>@item.StockItem?.Category</td>
+                                <td>@item.Quantity</td>
+                                <td>@((item.PriceOverride ?? 0).ToString("0.00"))</td>
+                                <td><span class="badge-status @badgeClass">@badgeText</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- When the shop has no items yet -->
+        <div class="alert alert-info mt-4">
+            No items in stock yet. Add products from the Owner’s inventory below.
+        </div>
+    }
+
+    <!-- ========== ACTION BUTTONS ========== -->
+    <div class="bottom-actions">
+        <!-- View Stock Button -->
+        <a asp-controller="ShopStocks" asp-action="Index" class="btn btn-primary">
+            <i class="bi bi-box"></i> View My Stock
+        </a>
+
+        <!-- Add Stock Button -->
+        <a asp-controller="ShopStocks" asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Add Stock
+        </a>
+
+        <!-- POS Sales Button -->
+        <a asp-controller="ShopPOS" asp-action="Index" class="btn btn-warning text-dark">
+            <i class="bi bi-cash-stack"></i> POS Sales
+        </a>
+    </div>
+</div>
+
+<!-- ================== FOOTER ================== -->
+<footer>
+    © @DateTime.Now.Year EasyGamesStore | Manage Smarter. Sell Faster. 🚀
+</footer>

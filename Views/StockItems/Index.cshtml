@@ -1,0 +1,355 @@
+﻿@model IEnumerable<EasyGamesStore.Models.StockItem>
+
+@{
+    // ==============================================================
+    // PAGE SETUP AND DATA PREPARATION
+    // ==============================================================
+    // Sets the page title visible in the browser tab.
+    ViewData["Title"] = "Stock Management Dashboard";
+
+    // These ViewBag properties come from the controller and summarize key metrics.
+    var totalValue = (decimal)ViewBag.TotalInventoryValue;       // Total stock cost value (sum of cost price * quantity)
+    var totalRevenue = (decimal)ViewBag.TotalPotentialRevenue;   // Total possible revenue (sum of selling price * quantity)
+    var totalProfit = (decimal)ViewBag.TotalPotentialProfit;     // Total potential profit (revenue - cost)
+
+    // Extract unique categories and sources from the StockItem list for filters.
+    var categories = Model.Select(i => i.Category).Distinct().OrderBy(c => c).ToList();
+    var sources = Model.Select(i => i.Source).Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s).ToList();
+}
+
+<!-- ==============================================================
+     DASHBOARD HEADER
+     ==============================================================
+     Provides a visual top section for the dashboard with a title,
+     description, and gradient styling consistent across your admin UI.
+-->
+<div class="dashboard-header">
+    <div class="container">
+        <h1 class="fw-bold text-white mb-1">📊 Stock Management Dashboard</h1>
+        <p class="text-light mb-0">
+            Track inventory, profit margins, and revenue trends with real-time insights.
+        </p>
+    </div>
+</div>
+
+<!-- ==============================================================
+     MAIN CONTENT SECTION
+     ==============================================================
+     Contains all dashboard elements: summary cards, filters, table,
+     and profit visualization chart.
+-->
+<div class="container bg-white text-dark p-4 rounded-4 shadow-sm mt-5 mb-5 border fade-in">
+
+    <!-- ==============================================================
+         SUMMARY CARDS (Top Metrics)
+         ==============================================================
+         Three compact cards showing financial KPIs:
+         - Inventory value
+         - Total potential revenue
+         - Total potential profit
+    -->
+    <div class="row mb-4 text-center">
+        <!-- Inventory Value -->
+        <div class="col-md-4 mb-3">
+            <div class="summary-card border-success">
+                <div class="summary-icon text-success"><i class="bi bi-cash-coin"></i></div>
+                <h6 class="text-muted mb-1">Total Inventory Value</h6>
+                <h4 class="fw-bold text-success">$@totalValue.ToString("N2")</h4>
+            </div>
+        </div>
+
+        <!-- Potential Revenue -->
+        <div class="col-md-4 mb-3">
+            <div class="summary-card border-info">
+                <div class="summary-icon text-info"><i class="bi bi-graph-up-arrow"></i></div>
+                <h6 class="text-muted mb-1">Total Potential Revenue</h6>
+                <h4 class="fw-bold text-info">$@totalRevenue.ToString("N2")</h4>
+            </div>
+        </div>
+
+        <!-- Potential Profit -->
+        <div class="col-md-4 mb-3">
+            <div class="summary-card border-warning">
+                <div class="summary-icon text-warning"><i class="bi bi-piggy-bank"></i></div>
+                <h6 class="text-muted mb-1">Total Potential Profit</h6>
+                <h4 class="fw-bold @(totalProfit >= 0 ? "text-warning" : "text-danger")">
+                    $@totalProfit.ToString("N2")
+                </h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================================
+         FILTER CONTROLS
+         ==============================================================
+         Dropdowns to narrow down displayed data in the table and chart.
+         Users can filter stock items by Category or Source.
+    -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Filter by Category:</label>
+            <select id="categoryFilter" class="form-select border-secondary text-dark bg-white">
+                <option value="">All Categories</option>
+                @foreach (var c in categories)
+                {
+                    <option value="@c">@c</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Filter by Source:</label>
+            <select id="sourceFilter" class="form-select border-secondary text-dark bg-white">
+                <option value="">All Sources</option>
+                @foreach (var s in sources)
+                {
+                    <option value="@s">@s</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <!-- ==============================================================
+         ACTION BAR
+         ==============================================================
+         Provides quick access for adding new stock items and displays
+         a “last updated” timestamp for clarity.
+    -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+            ➕ Add New Item
+        </a>
+        <span class="text-muted small">
+            Last Updated: @DateTime.Now.ToString("dd MMM yyyy, hh:mm tt")
+        </span>
+    </div>
+
+    <!-- ==============================================================
+         STOCK TABLE
+         ==============================================================
+         Displays detailed stock data in tabular format with color-coded
+         profit margins and easy access to CRUD actions.
+    -->
+    <div class="table-responsive">
+        <table class="table table-striped align-middle text-center border shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Source</th>
+                    <th>Buying Price</th>
+                    <th>Selling Price</th>
+                    <th>Profit/Unit</th>
+                    <th>Stock Qty</th>
+                    <th>Profit Margin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    // Calculate the profit margin for each item.
+                    var margin = item.CostPrice > 0 ? ((item.Price - item.CostPrice) / item.CostPrice * 100) : 0;
+
+                    // Assign badge color based on profitability level.
+                    var marginColor = margin > 30 ? "bg-success"
+                                     : margin > 10 ? "bg-info"
+                                     : margin > 0 ? "bg-warning"
+                                     : "bg-danger";
+
+                    <tr data-category="@item.Category" data-source="@item.Source">
+                        <td>@item.Title</td>
+                        <td>@item.Category</td>
+                        <td>@(string.IsNullOrEmpty(item.Source) ? "—" : item.Source)</td>
+                        <td>$@item.CostPrice.ToString("0.00")</td>
+                        <td>$@item.Price.ToString("0.00")</td>
+
+                        <!-- Shows per-unit profit with green (positive) or red (negative) -->
+                        <td class="@(item.ProfitPerUnit >= 0 ? "text-success" : "text-danger")">
+                            $@item.ProfitPerUnit.ToString("0.00")
+                        </td>
+
+                        <td>@item.Quantity</td>
+                        <td><span class="badge @marginColor">@margin.ToString("0.0")%</span></td>
+
+                        <!-- CRUD Action buttons -->
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary me-1">View</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==============================================================
+         PROFIT ANALYSIS CHART
+         ==============================================================
+         Visualizes top 5 profitable products dynamically.
+         Updates automatically when filters are changed.
+    -->
+    <div class="mt-5">
+        <h3 class="fw-bold text-dark text-center mb-3">📈 Profit Analysis (Filtered)</h3>
+        <canvas id="profitChart" height="120"></canvas>
+    </div>
+</div>
+
+<!-- ==============================================================
+     CHART.JS AND FILTER LOGIC
+     ==============================================================
+     Handles dynamic updates for table filtering and the profit bar chart.
+-->
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Convert server-side model data into a JS array of objects.
+        const allItems = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.Select(i => new {
+                i.Title,
+                i.Category,
+                i.Source,
+                Profit = (i.Price - i.CostPrice) * i.Quantity
+            })
+        ));
+
+        // Initialize chart context
+        const ctx = document.getElementById('profitChart').getContext('2d');
+
+        // Create a reusable bar chart instance
+        let chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Total Profit ($)',
+                    data: [],
+                    backgroundColor: ['#0d6efd', '#6610f2', '#ffc107', '#198754', '#dc3545'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false }, // Hides redundant legend
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => `$${ctx.parsed.y.toFixed(2)}`
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { color: '#000' }, grid: { color: '#e0e0e0' } },
+                    x: { ticks: { color: '#000' }, grid: { display: false } }
+                }
+            }
+        });
+
+        // Updates the chart to show the top 5 profitable items from the filtered list
+        function updateChart(filteredItems) {
+            const top = filteredItems.sort((a,b) => b.Profit - a.Profit).slice(0,5);
+            chart.data.labels = top.map(i => i.Title);
+            chart.data.datasets[0].data = top.map(i => i.Profit.toFixed(2));
+            chart.update();
+        }
+
+        // Handles dropdown filtering for both category and source
+        function filterItems() {
+            const cat = document.getElementById('categoryFilter').value;
+            const src = document.getElementById('sourceFilter').value;
+
+            const filtered = allItems.filter(i =>
+                (cat === '' || i.Category === cat) &&
+                (src === '' || i.Source === src)
+            );
+
+            // Hide or show table rows based on current filters
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const rowCat = row.dataset.category;
+                const rowSrc = row.dataset.source;
+                row.style.display = ((cat === '' || rowCat === cat) && (src === '' || rowSrc === src)) ? '' : 'none';
+            });
+
+            updateChart(filtered);
+        }
+
+        // Attach event listeners to dropdowns
+        document.getElementById('categoryFilter').addEventListener('change', filterItems);
+        document.getElementById('sourceFilter').addEventListener('change', filterItems);
+
+        // Initialize chart with all items on page load
+        updateChart(allItems);
+    </script>
+}
+
+<!-- ==============================================================
+     STYLES (Consistent White-Themed Admin Aesthetic)
+     ==============================================================
+     Enhances the dashboard with soft colors, clean layout, and animations.
+-->
+<style>
+    body {
+        background-color: #f4f6f9;
+        color: #000;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* HEADER BAR */
+    .dashboard-header {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 30px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    /* SUMMARY CARDS */
+    .summary-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 18px;
+        transition: all 0.2s ease;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .summary-icon {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+
+    /* TABLE */
+    .table {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table th {
+        background: #0d6efd !important;
+        color: #fff !important;
+    }
+
+    /* PROFIT CHART */
+    #profitChart {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 1rem;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ANIMATION */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

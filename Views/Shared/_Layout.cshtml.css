@@ -1,0 +1,62 @@
+﻿/* 
+   This CSS file defines global styling rules for the EasyGamesStore web application. 
+   It primarily sets the default color scheme, button appearance, and layout spacing for 
+   navigation elements and the footer. These styles are loaded by _Layout.cshtml and 
+   automatically applied across all pages for consistency.
+*/
+
+/* Ensures the website brand name in the navbar displays properly on smaller screens */
+a.navbar-brand {
+    white-space: normal; /* Allows wrapping of long text */
+    text-align: center; /* Centers text if it wraps */
+    word-break: break-all; /* Breaks long words to prevent overflow */
+}
+
+/* Sets the default link color throughout the site */
+a {
+    color: #0077cc;
+}
+
+/* Custom styling for Bootstrap primary buttons */
+.btn-primary {
+    color: #fff; /* White text for contrast */
+    background-color: #1b6ec2; /* Medium blue background */
+    border-color: #1861ac; /* Slightly darker border for depth */
+}
+
+/* Active navigation pill styling */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    color: #fff; /* White text when active */
+    background-color: #1b6ec2; /* Same blue as primary button */
+    border-color: #1861ac;
+}
+
+/* Reusable border utility classes for layout separation */
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Subtle shadow effect for elements like cards or navbar */
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+/* Styling for cookie or policy acceptance buttons */
+button.accept-policy {
+    font-size: 1rem; /* Readable size */
+    line-height: inherit; /* Matches surrounding text spacing */
+}
+
+/* Footer layout: ensures it stays at the bottom of the page */
+.footer {
+    position: absolute; /* Anchors footer to bottom of viewport */
+    bottom: 0;
+    width: 100%; /* Spans entire width */
+    white-space: nowrap; /* Prevents text wrapping */
+    line-height: 60px; /* Sets footer height and text alignment */
+}

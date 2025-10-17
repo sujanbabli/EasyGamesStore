@@ -1,0 +1,103 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<!--
+    This partial view (_LoginPartial.cshtml) manages user authentication links displayed in the navbar.
+    It dynamically changes what is shown depending on whether the user is logged in or not.
+    If logged in, it displays a personalized greeting and a logout button.
+    If not logged in, it displays Register and Login buttons.
+-->
+
+<ul class="navbar-nav d-flex align-items-center">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <!--
+            When the user is logged in:
+            Display a friendly greeting with the user's name and a logout button.
+        -->
+        <li class="nav-item me-3">
+            <span class="nav-link text-white fw-semibold">
+                <i class="bi bi-person-circle me-1"></i>
+                Hello @User.Identity?.Name!
+            </span>
+        </li>
+
+        <!--
+            The Logout button submits a POST request to the Identity framework’s logout page.
+            After logout, it redirects the user back to the Home page.
+        -->
+        <li class="nav-item">
+            <form class="d-inline" asp-area="Identity" asp-page="/Account/Logout"
+                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="btn btn-outline-light btn-sm fw-semibold">
+                    Logout
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <!--
+            When the user is NOT logged in:
+            Display Register and Login buttons to guide users to authentication pages.
+        -->
+        <li class="nav-item me-2">
+            <a class="btn btn-outline-primary btn-sm fw-semibold"
+               asp-area="Identity" asp-page="/Account/Register">
+                Register
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-primary btn-sm fw-semibold text-white"
+               asp-area="Identity" asp-page="/Account/Login">
+                Login
+            </a>
+        </li>
+    }
+</ul>
+
+<style>
+    /*
+           =============================
+           STYLING FOR NAVBAR BUTTONS
+           =============================
+           This CSS defines the appearance of the Register/Login buttons and user greeting
+           within the top navigation bar. The design maintains a consistent dark-mode aesthetic
+           aligned with the rest of the EasyGamesStore theme.
+        */
+
+    /* General button appearance: rounded edges with smooth hover animation */
+    .navbar-nav .btn {
+        border-radius: 0.3rem;
+        transition: all 0.3s ease;
+    }
+
+    /* Hover effect for the primary login button: darkens slightly for emphasis */
+    .navbar-nav .btn-primary:hover {
+        background-color: #5200b7;
+        border-color: #5200b7;
+    }
+
+    /* Outline-style register button: cyan border and text by default */
+    .navbar-nav .btn-outline-primary {
+        color: #22d3ee; /* Accent color consistent with site theme */
+        border-color: #22d3ee;
+    }
+
+        /* On hover, the outlined button fills with cyan and switches to dark text */
+        .navbar-nav .btn-outline-primary:hover {
+            background-color: #22d3ee;
+            color: #0b0d12; /* Keeps readability against the light background */
+        }
+
+    /* Default color for navbar text links (like the greeting) */
+    .navbar-nav .nav-link {
+        color: #e9eef7; /* Light text for contrast against dark background */
+    }
+
+        /* Cyan hover effect for interactive feedback */
+        .navbar-nav .nav-link:hover {
+            color: #22d3ee;
+        }
+</style>

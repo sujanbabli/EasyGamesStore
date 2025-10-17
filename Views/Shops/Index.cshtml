@@ -1,0 +1,188 @@
+﻿@model IEnumerable<EasyGamesStore.Models.Shop>
+
+@{
+    ViewData["Title"] = "Shops Management";
+}
+
+<!-- ========== HEADER ========== -->
+<div class="header-bar">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold text-white mb-1">🏬 Shops Management Dashboard</h2>
+            <p class="text-light mb-0">Manage shops, addresses, and proprietor assignments efficiently.</p>
+        </div>
+        <span class="badge bg-light text-dark">Updated: @DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="container fade-in my-5">
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info mb-4 shadow-sm">@TempData["Message"]</div>
+    }
+
+    <!-- Action Buttons -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <div>
+            <a asp-action="Create" class="btn btn-success shadow-sm me-2">➕ Create Shop</a>
+            <a asp-action="AssignProprietor" class="btn btn-info shadow-sm">👤 Assign Proprietor</a>
+        </div>
+        <span class="text-muted small">Tip: Assign proprietors to newly created shops to activate management access.</span>
+    </div>
+
+    <!-- Shops Table -->
+    <div class="table-responsive rounded-3 shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Phone</th>
+                    <th>Proprietor Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var shop in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@shop.Name</td>
+                        <td>@shop.Address</td>
+                        <td>@shop.Phone</td>
+                        <td>@(string.IsNullOrWhiteSpace(shop.ProprietorEmail) ? "—" : shop.ProprietorEmail)</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@shop.Id" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                            <a asp-action="Details" asp-route-id="@shop.Id" class="btn btn-sm btn-outline-info me-1">Details</a>
+                            <a asp-action="Delete" asp-route-id="@shop.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ========== STYLES ========== -->
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header Bar */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn-success {
+        background-color: #198754;
+        border: none;
+    }
+
+        .btn-success:hover {
+            background-color: #157347;
+            box-shadow: 0 0 10px rgba(25, 135, 84, 0.4);
+        }
+
+    .btn-info {
+        background-color: #0dcaf0;
+        border: none;
+        color: #fff;
+    }
+
+        .btn-info:hover {
+            background-color: #0bbbe3;
+            box-shadow: 0 0 10px rgba(13, 202, 240, 0.4);
+        }
+
+    .btn-outline-warning {
+        border-color: #ffc107;
+        color: #856404;
+    }
+
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+    .btn-outline-info {
+        border-color: #0dcaf0;
+        color: #0dcaf0;
+    }
+
+        .btn-outline-info:hover {
+            background-color: #0dcaf0;
+            color: #fff;
+        }
+
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    /* Table */
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #fff;
+    }
+
+        .table th {
+            background-color: #0d6efd;
+            color: #fff;
+            font-weight: 600;
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #eef5ff;
+        transition: 0.2s;
+    }
+
+    /* Alerts */
+    .alert {
+        border-radius: 8px;
+        color: #000;
+    }
+
+    .alert-info {
+        background-color: #cff4fc;
+        border: 1px solid #b6effb;
+    }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

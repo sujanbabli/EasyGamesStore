@@ -1,0 +1,152 @@
+﻿@model EasyGamesStore.Models.EditUserViewModel
+
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<!-- ========== HEADER ========== -->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold text-white mb-1">👤 Edit User</h2>
+            <p class="text-light mb-0">Modify user details and assigned roles.</p>
+        </div>
+        <span class="badge bg-light text-dark">Updated: @DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="container bg-white rounded-4 shadow-sm p-4 fade-in my-5" style="max-width: 700px;">
+    <h4 class="fw-bold text-primary mb-3">🧾 User Information</h4>
+    <hr />
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label fw-semibold text-dark">Email</label>
+            <input asp-for="Email" class="form-control border-secondary" placeholder="Enter user's email" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+
+        <!-- Roles -->
+        <div class="mb-4">
+            <label class="form-label fw-semibold text-dark">Roles</label>
+            <div class="p-3 border rounded bg-light">
+                @foreach (var role in Model.AllRoles)
+                {
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="selectedRoles" value="@role"
+                               @(Model.Roles.Contains(role) ? "checked" : "") />
+                        <label class="form-check-label">@role</label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex align-items-center">
+            <button type="submit" class="btn btn-primary px-4 me-2 shadow-sm">💾 Save Changes</button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<!-- ========== STYLES ========== -->
+<style>
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #212529;
+    }
+
+    /* Header Bar */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Inputs and Focus */
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        transition: 0.2s ease;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13, 110, 253, 0.25);
+        }
+
+    .form-check-input {
+        border-color: #6c757d;
+    }
+
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+    .form-check-label {
+        color: #212529;
+        font-weight: 500;
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.4);
+        }
+
+    .btn-outline-secondary {
+        border: 1px solid #6c757d;
+        color: #212529;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    h4 {
+        color: #0d6efd;
+    }
+</style>

@@ -1,0 +1,168 @@
+﻿@model EasyGamesStore.Models.CreateUserViewModel
+
+<!-- ======= HEADER ======= -->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold text-white mb-0">👤 Create New User</h2>
+            <p class="text-light mb-0">Add users to the EasyGamesStore platform with secure role assignment.</p>
+        </div>
+        <span class="badge bg-light text-dark">Admin Panel</span>
+    </div>
+</div>
+
+<!-- ======= FORM CONTAINER ======= -->
+<div class="create-user-page py-5">
+    <div class="container form-card text-light p-4 rounded-4 shadow-lg fade-in" style="max-width: 600px;">
+        <h3 class="text-gradient-primary mb-4 fw-bold">Create User Account</h3>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger mb-3">@TempData["Error"]</div>
+        }
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label fw-semibold"></label>
+                <input asp-for="Email" class="form-control glass-input" placeholder="Enter email address" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label fw-semibold"></label>
+                <input asp-for="Password" type="password" class="form-control glass-input" placeholder="Enter password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <!-- Role -->
+            <div class="mb-4">
+                <label asp-for="Role" class="form-label fw-semibold"></label>
+                <select asp-for="Role" class="form-select glass-input">
+                    <option value="">Select Role</option>
+                    <option value="Owner">Owner</option>
+                    <option value="Proprietor">Proprietor</option>
+                    <option value="User">User</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex align-items-center">
+                <button type="submit" class="btn btn-primary btn-glow me-2">➕ Create</button>
+                <a asp-action="Index" class="btn btn-outline-light">⬅ Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ======= STYLES ======= -->
+<style>
+    body {
+        background: radial-gradient(circle at top left, #0d1117, #0b0d12 80%);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #e9eef7;
+        overflow-x: hidden;
+    }
+
+    /* Gradient Header */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        padding: 25px 20px;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Form Container */
+    .form-card {
+        background: rgba(19, 23, 34, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+        .form-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Inputs */
+    .glass-input {
+        background-color: rgba(13, 17, 25, 0.85);
+        color: #e9eef7;
+        border: 1px solid #333;
+        border-radius: 8px;
+        transition: all 0.25s ease;
+    }
+
+        .glass-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 10px rgba(13, 110, 253, 0.35);
+            background-color: rgba(19, 23, 34, 0.95);
+            color: #fff;
+        }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-glow:hover {
+        background-color: #0b5ed7;
+        box-shadow: 0 0 12px rgba(13, 110, 253, 0.6);
+    }
+
+    .btn-outline-light {
+        border: 1px solid #bbb;
+        color: #fff;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+        .btn-outline-light:hover {
+            background-color: #fff;
+            color: #0b0d12;
+        }
+
+    /* Alerts */
+    .alert {
+        border-radius: 8px;
+    }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.7s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

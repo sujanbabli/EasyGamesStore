@@ -1,0 +1,225 @@
+﻿@{
+    ViewData["Title"] = "Add Stock from Owner Inventory";
+    var ownerStock = ViewBag.OwnerStock as List<EasyGamesStore.Models.StockItem>;
+}
+
+<!-- ================= PAGE HEADER ================= -->
+<div class="header-bar mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-0 text-white">Add Stock from Owner Inventory</h2>
+            <p class="mb-0 text-light">Select an item and quantity to add to your shop’s stock.</p>
+        </div>
+        <span class="badge bg-light text-dark">Updated: @DateTime.Now.ToString("dd MMM yyyy")</span>
+    </div>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="container fade-in">
+    <div class="card shadow-sm p-4 border-0 rounded-4 mx-auto form-card">
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger text-dark">@TempData["Error"]</div>
+        }
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success text-dark">@TempData["Message"]</div>
+        }
+
+        <form asp-action="Create" method="post">
+            <!-- Stock Item Dropdown -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-dark">Select Stock Item</label>
+                <select id="stockSelect" name="stockItemId" class="form-select border-secondary stylish-select text-dark" required>
+                    <option value="">-- Select Item --</option>
+                    @foreach (var item in ownerStock)
+                    {
+                        var sourceText = string.IsNullOrEmpty(item.Source) ? "Unknown" : item.Source;
+                        <option value="@item.Id"
+                                data-title="@item.Title"
+                                data-category="@item.Category"
+                                data-price="@item.Price.ToString("0.00")"
+                                data-stock="@item.Quantity"
+                                data-source="@sourceText">
+                            @($"{item.Title} ({item.Category}) - ${item.Price:F2} | Stock: {item.Quantity} | Source: {sourceText}")
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <!-- Preview Section -->
+            <div id="previewCard" class="preview-card d-none mb-4 p-3 rounded-3 shadow-sm border">
+                <h5 class="fw-bold text-dark mb-2"><i class="bi bi-box-seam me-2"></i><span id="previewTitle">Item Title</span></h5>
+                <p class="mb-1"><strong>Category:</strong> <span id="previewCategory"></span></p>
+                <p class="mb-1"><strong>Source:</strong> <span id="previewSource"></span></p>
+                <p class="mb-1"><strong>Owner Price:</strong> $<span id="previewPrice"></span></p>
+                <p class="mb-1"><strong>Available Stock:</strong> <span id="previewStock"></span></p>
+            </div>
+
+            <!-- Quantity Input -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-dark">Quantity to Add</label>
+                <input type="number" name="quantity"
+                       class="form-control border-secondary text-dark"
+                       min="1" placeholder="Enter quantity to add" required />
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex align-items-center gap-2">
+                <button type="submit" class="btn btn-primary btn-glow px-4">➕ Add Stock</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= STYLES ================= -->
+<style>
+    body {
+        background-color: #f4f6f9;
+        color: #000;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* Header Bar */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    /* Card */
+    .form-card {
+        background: #ffffff;
+        max-width: 700px;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+        .form-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    /* Select and Input */
+    .stylish-select {
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background-color: #fff;
+        transition: box-shadow 0.2s ease-in-out;
+    }
+
+        .stylish-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13, 110, 253, 0.25);
+        }
+
+    .form-control {
+        border-radius: 8px;
+        color: #000;
+        background-color: #ffffff;
+        transition: box-shadow 0.2s ease-in-out;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13, 110, 253, 0.25);
+        }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-glow:hover {
+        background-color: #0056b3;
+        box-shadow: 0 0 12px rgba(13, 110, 253, 0.45);
+    }
+
+    .btn-outline-secondary {
+        border-radius: 8px;
+        color: #000;
+        border-color: #6c757d;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+    /* Alerts */
+    .alert {
+        border-radius: 8px;
+        color: #000;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+    }
+
+    /* Preview Card */
+    .preview-card {
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+        .preview-card.show {
+            transform: scale(1.02);
+        }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+    // Show live item details when selected
+    const select = document.getElementById('stockSelect');
+    const preview = document.getElementById('previewCard');
+
+    select.addEventListener('change', function () {
+        const selected = select.options[select.selectedIndex];
+
+        if (selected.value === "") {
+            preview.classList.add('d-none');
+            return;
+        }
+
+        document.getElementById('previewTitle').innerText = selected.dataset.title;
+        document.getElementById('previewCategory').innerText = selected.dataset.category;
+        document.getElementById('previewPrice').innerText = selected.dataset.price;
+        document.getElementById('previewStock').innerText = selected.dataset.stock;
+        document.getElementById('previewSource').innerText = selected.dataset.source;
+
+        preview.classList.remove('d-none');
+        preview.classList.add('show');
+    });
+</script>

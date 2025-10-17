@@ -1,0 +1,183 @@
+﻿@page
+@model RegisterModel
+@{
+    // Sets the title for the current Razor Page.
+    // This will appear on the browser tab and can also be used dynamically in the view.
+    ViewData["Title"] = "Register";
+}
+
+<!--
+    The main container centers the registration form both vertically and horizontally.
+    The flexbox ensures responsiveness and proper alignment across different screen sizes.
+-->
+<div class="container py-5 text-dark" style="min-height:100vh; display:flex; align-items:center; justify-content:center;">
+
+    <!--
+        The card serves as the main form box.
+        I used rounded corners, a soft shadow, and a light background
+        to make it clean, readable, and user-friendly.
+    -->
+    <div class="card shadow-lg p-4 rounded-4 border-0" style="max-width:400px; width:100%; background-color:#f8f9fa;">
+
+        <!--
+            The main heading displays the page title ("Register")
+            with a gradient color for a modern, aesthetic look.
+        -->
+        <h2 class="text-center fw-bold text-gradient-primary mb-4">@ViewData["Title"]</h2>
+
+        <!--
+            The registration form posts data to the server using the POST method.
+            The 'asp-route-returnUrl' ensures users are redirected after registration.
+        -->
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+
+            <!-- Small sub-heading to guide users -->
+            <h5 class="text-dark mb-3">Create a new account.</h5>
+
+            <!-- Decorative divider line with gradient color -->
+            <hr class="mx-auto mb-4" style="width:6rem;height:3px;background:linear-gradient(90deg,#0d6efd,#6610f2);border:none;border-radius:1rem;" />
+
+            <!--
+                Displays validation messages at the top
+                if there are any errors (e.g., missing email or mismatched passwords).
+            -->
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <!-- Email Input Field -->
+            <div class="form-floating mb-3">
+                <!--
+                    The email field binds to Input.Email from the RegisterModel.
+                    'autocomplete' allows browsers to suggest stored emails for convenience.
+                -->
+                <input asp-for="Input.Email"
+                       class="form-control border-secondary-subtle"
+                       autocomplete="username"
+                       aria-required="true"
+                       placeholder="name@example.com" />
+
+                <!-- Floating label for better UX -->
+                <label asp-for="Input.Email">Email</label>
+
+                <!-- Validation message for incorrect or empty email -->
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <!-- Password Input Field -->
+            <div class="form-floating mb-3">
+                <!--
+                    Binds to Input.Password.
+                    'autocomplete="new-password"' ensures browsers don’t autofill old passwords.
+                -->
+                <input asp-for="Input.Password"
+                       class="form-control border-secondary-subtle"
+                       autocomplete="new-password"
+                       aria-required="true"
+                       placeholder="password" />
+
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="form-floating mb-3">
+                <!--
+                    Allows the user to retype the password for confirmation.
+                    The validation ensures both passwords match before submission.
+                -->
+                <input asp-for="Input.ConfirmPassword"
+                       class="form-control border-secondary-subtle"
+                       autocomplete="new-password"
+                       aria-required="true"
+                       placeholder="confirm password" />
+
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <!--
+                Hidden Role Field:
+                This automatically assigns new users the "User" role by default.
+                This prevents users from self-assigning admin or other roles.
+            -->
+            <input type="hidden" name="Role" value="User" />
+
+            <!-- Register Button -->
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary mb-3">Register</button>
+
+            <!-- Link to Login Page -->
+            <div class="text-center">
+                <p><a asp-page="./Login" class="text-primary text-decoration-underline">Already have an account? Log in</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--
+    Custom CSS for page aesthetics and consistent theme across login/register pages.
+    Focused on simplicity, readability, and gentle visual feedback.
+-->
+<style>
+    /* Global body style */
+    body {
+        background-color: #ffffff;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #212529;
+    }
+
+    /* Gradient text effect for headings */
+    .text-gradient-primary {
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Input field base design */
+    .form-control {
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+
+        /* Input focus effect with purple glow */
+        .form-control:focus {
+            border-color: #6610f2;
+            box-shadow: 0 0 8px rgba(102, 16, 242, 0.3);
+        }
+
+    /* Gradient button design */
+    .btn-primary {
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        /* Slight lift and glow effect when hovered */
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.25);
+            transform: translateY(-1px);
+        }
+
+    /* Card hover animation */
+    .card {
+        background-color: #f8f9fa;
+        border-radius: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.1);
+        }
+
+    /* Link hover color change for better interactivity */
+    a.text-primary:hover {
+        color: #6610f2 !important;
+    }
+</style>
+
+<!--
+    Includes client-side validation scripts provided by ASP.NET Core Identity.
+    This ensures form validation happens before submission, improving UX.
+-->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

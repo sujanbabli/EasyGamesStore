@@ -1,0 +1,241 @@
+﻿@model IEnumerable<EasyGamesStore.Models.ShopStock>
+
+@{
+    ViewData["Title"] = $"{ViewBag.ShopName} Inventory";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+
+<style>
+    body {
+        background: #f4f6f9;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        overflow-x: hidden;
+    }
+
+    /* Gradient Header */
+    .header-bar {
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+        .header-bar h2 {
+            font-weight: 700;
+        }
+
+        .header-bar p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+    .inventory-wrapper {
+        margin-top: 30px;
+        padding-bottom: 140px; /* prevent overlap with footer */
+    }
+
+    /* Main Inventory Card */
+    .inventory-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid #e1e5eb;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .inventory-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+        }
+
+    /* Table styles */
+    table {
+        border-radius: 10px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    thead {
+        background: #0d6efd;
+        color: white;
+    }
+
+    tbody tr:hover {
+        background-color: #f8fbff;
+        transition: background-color 0.2s ease;
+    }
+
+    th, td {
+        vertical-align: middle !important;
+    }
+
+    /* Stock level badges */
+    .stock-badge {
+        padding: 5px 8px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .low-stock {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .medium-stock {
+        background-color: #0dcaf0;
+        color: #000;
+    }
+
+    .healthy-stock {
+        background-color: #20c997;
+        color: white;
+    }
+
+    /* Add button styling */
+    .btn-add {
+        position: fixed;
+        bottom: 20px;
+        right: 30px;
+        border-radius: 50px;
+        padding: 14px 25px;
+        font-size: 1.1rem;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+
+        .btn-add:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        }
+
+    /* Footer */
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(90deg, #0d6efd, #20c997);
+        color: #fff;
+        text-align: center;
+        padding: 12px;
+        font-size: 0.9rem;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
+        z-index: 999;
+    }
+
+    /* Animation */
+    .fade-in {
+        animation: fadeIn 0.6s ease forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<!-- HEADER -->
+<div class="header-bar">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2>@ViewBag.ShopName Inventory</h2>
+            <p>Manage, review, and control your product stock efficiently.</p>
+        </div>
+        <div>
+            <span class="badge bg-light text-dark">Updated: @DateTime.Now.ToString("dd MMM yyyy")</span>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container inventory-wrapper fade-in">
+    <div class="inventory-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold text-dark mb-0">📦 Inventory Overview</h4>
+            <a asp-action="Create" class="btn btn-primary rounded-pill">➕ Add Stock</a>
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success">@TempData["Message"]</div>
+        }
+
+        <div class="table-responsive">
+            <table class="table align-middle table-bordered">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Stock Level</th>
+                        <th>Source</th>
+                        <th>Cost Price ($)</th>
+                        <th>Selling Price ($)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        string badgeClass;
+                        string badgeText;
+
+                        if (item.Quantity <= 2)
+                        {
+                            badgeClass = "low-stock";
+                            badgeText = "Low";
+                        }
+                        else if (item.Quantity <= 10)
+                        {
+                            badgeClass = "medium-stock";
+                            badgeText = "Medium";
+                        }
+                        else
+                        {
+                            badgeClass = "healthy-stock";
+                            badgeText = "Healthy";
+                        }
+
+                        <tr>
+                            <td>@item.StockItem?.Title</td>
+                            <td>@item.StockItem?.Category</td>
+                            <td>@item.Quantity</td>
+                            <td><span class="stock-badge @badgeClass">@badgeText</span></td>
+                            <td>@(string.IsNullOrEmpty(item.Source) ? "—" : item.Source)</td>
+                            <td>@(item.CostPrice.HasValue? item.CostPrice.Value.ToString("0.00") : "-")</td>
+                            <td>@(item.PriceOverride.HasValue? item.PriceOverride.Value.ToString("0.00") : "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Add Button -->
+<a asp-action="Create" class="btn btn-success btn-add">
+    ➕ Add New Stock
+</a>
+
+<!-- FOOTER -->
+<footer>
+    © @DateTime.Now.Year EasyGamesStore | Smart Inventory Management ⚙️
+</footer>

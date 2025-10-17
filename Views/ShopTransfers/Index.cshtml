@@ -1,0 +1,71 @@
+﻿@model IEnumerable<EasyGamesStore.Models.ShopTransfer>
+
+<!-- ===============================
+     PAGE HEADING
+     =============================== -->
+<!--
+     Displays the main title for the Shop Transfers page.
+     Users can view all past transfer records and initiate new ones.
+-->
+<h2>Shop Transfers</h2>
+
+<!--
+     Primary action button that navigates to the Create view
+     for adding a new shop transfer record.
+-->
+<a asp-action="Create" class="btn btn-primary mb-3">+ New Transfer</a>
+
+<!-- ===============================
+     TEMP DATA MESSAGES
+     =============================== -->
+<!--
+     Displays success or error messages passed from the controller
+     via TempData. These messages confirm actions such as transfer creation,
+     or inform the user of issues (e.g., insufficient stock).
+-->
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- ===============================
+     TRANSFERS TABLE
+     =============================== -->
+<!--
+     Lists all existing shop transfers in a simple, tabular format.
+     Each row represents a single transfer event between shops.
+     Displays shop name, stock item transferred, quantity, and timestamp.
+-->
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Shop</th>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Loop through all transfer records in the model -->
+        @foreach (var t in Model)
+        {
+            <tr>
+                <!-- Shop name (nullable in case a transfer is missing reference data) -->
+                <td>@t.Shop?.Name</td>
+
+                <!-- Stock item title (nullable for same reason) -->
+                <td>@t.StockItem?.Title</td>
+
+                <!-- Quantity transferred -->
+                <td>@t.Quantity</td>
+
+                <!-- Transfer date converted to local time and formatted for readability -->
+                <td>@t.CreatedAt.ToLocalTime().ToString("g")</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -104,16 +104,16 @@ Register as a Customer to browse products and make purchases.
 
 🧰 Troubleshooting
 
-Issue	            	  Possible Solution
-Database not found	  	Verify SQL Server instance and rerun migration.
-Login fails         	Use default credentials or register a new account.
-Missing packages		Rebuild project and restore NuGet packages.
-Port conflict			Change launch port via Project Properties → Debug.
+Issue	            	-   Possible Solution :
+Database not found	  	- Verify SQL Server instance and rerun migration.
+Login fails         	- Use default credentials or register a new account.
+Missing packages		- Rebuild project and restore NuGet packages.
+Port conflict			- Change launch port via Project Properties → Debug.
 
 👥 Team Members
 
-Name	Role
-Shishtata Bhandari		Project Manager / Documentation Lead
-Dipan Shrestha			Backend Developer
-Sujan Kandel			Frontend & UI Developer
-Tirth Jyotikar			Tester / Quality Assurance
+Name -	Role: 
+Shishtata Bhandari		- Project Manager / Documentation Lead
+Dipan Shrestha			- Backend Developer
+Sujan Kandel			- Frontend & UI Developer
+Tirth Jyotikar			- Tester / Quality Assurance
